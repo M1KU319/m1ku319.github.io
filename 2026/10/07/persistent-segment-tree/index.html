@@ -1,0 +1,916 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/favicon.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="M1KU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Persistent Data Structure - Segment Tree  A persistent data structure is a data structure that always preserves the previous version of itself when it is modified. Such data structures are effectively">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Persistent Data Structure - Segment Tree">
+<meta property="og:url" content="https://m1ku319.github.io/2026/10/07/persistent-segment-tree/index.html">
+<meta property="og:site_name" content="M1KU&#39;s Blog">
+<meta property="og:description" content="Persistent Data Structure - Segment Tree  A persistent data structure is a data structure that always preserves the previous version of itself when it is modified. Such data structures are effectively">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://m1ku319.github.io/img/persistent-segment-tree-handdrawn.png">
+<meta property="article:published_time" content="2026-10-06T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-06T23:20:13.639Z">
+<meta property="article:author" content="M1KU">
+<meta property="article:tag" content="Data Structure">
+<meta property="article:tag" content="Segment Tree">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://m1ku319.github.io/img/persistent-segment-tree-handdrawn.png">
+  
+  
+  
+  <title>Persistent Data Structure - Segment Tree - M1KU&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"m1ku319.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>M1KU</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Persistent Data Structure - Segment Tree"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-10-07 00:00" pubdate>
+          October 7, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          768 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Persistent Data Structure - Segment Tree</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="persistent-data-structure---segment-tree">Persistent Data
+Structure - Segment Tree</h1>
+<blockquote>
+<p>A persistent data structure is a data structure that always preserves
+the previous version of itself when it is modified. Such data structures
+are effectively immutable, as their operations do not update the
+structure in place, but instead always yield a new updated
+structure.</p>
+</blockquote>
+<p>You should be familiar with basic segment trees before reading this
+post.</p>
+<h2 id="problem-statement">Problem Statement</h2>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3919">Persistent Segment
+Tree</a></p>
+<p>You need to maintain an array
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
+with a length of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>,
+supporting the following two operations:</p>
+<ol type="1">
+<li>Modify the value at a certain position in some historical
+version</li>
+<li>Query the value at a certain position in some historical
+version</li>
+</ol>
+<p>In addition, each operation creates a new version. The version number
+is the index of the current operation, starting from 1, while version 0
+represents the initial state of the array.</p>
+<p>For operation 2, the newly created version is completely identical to
+the version being queried, with no modifications made. In other words,
+the version generated by a query operation is simply a copy of the
+version that was queried.</p>
+<h3 id="input-format">Input Format</h3>
+<p>The first line contains two positive integers
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>,
+representing the length of the array and the number of operations,
+respectively.</p>
+<p>The second line contains
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+integers, where the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>-th
+integer is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>i</mi></msub><annotation encoding="application/x-tex">a_i</annotation></semantics></math>.</p>
+<p>The next
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
+lines each contain either 3 or 4 integers, representing one of the
+following two operations. Suppose the current operation is the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>-th
+operation:</p>
+<ol type="1">
+<li>For <strong>operation 1</strong>, the format is
+<code>v 1 p c</code>, meaning that based on version
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>,
+set
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>p</mi></msub><annotation encoding="application/x-tex">a_p</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>.</li>
+<li>For <strong>operation 2</strong>, the format is <code>v 2 p</code>,
+meaning that we query the value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>a</mi><mi>p</mi></msub><annotation encoding="application/x-tex">a_p</annotation></semantics></math>
+in version
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>.
+Note that this operation also creates a new version that is
+<strong>identical to version
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math></strong>.</li>
+</ol>
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>≤</mo><mi>N</mi><mo>,</mo><mi>M</mi><mo>≤</mo><msup><mn>10</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">1  \le N, M \le 10^6</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>≤</mo><mi>p</mi><mo>≤</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">1 \le p \le n</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><msup><mn>10</mn><mn>9</mn></msup><mo>≤</mo><msub><mi>a</mi><mi>i</mi></msub><mo>,</mo><mi>c</mi><mo>≤</mo><msup><mn>10</mn><mn>9</mn></msup></mrow><annotation encoding="application/x-tex">-10^9 \le a_i, c \le 10^9</annotation></semantics></math></li>
+</ul>
+<h2 id="copy-the-path">Copy the path</h2>
+<p>It is not hard to see that the limit is not the time complexity, but
+the space complexity. If we build a separate segment tree for every
+version, we will definitely exceed the memory limit.</p>
+<p>If we change the value of a leaf node, only the node on the path from
+the root to that leaf node would change, so that we only want to copy
+the path instead of creating a new tree. This is the idea behind a
+persistent segment tree.</p>
+<figure>
+<img src="/img/persistent-segment-tree-handdrawn.png" srcset="/img/loading.gif" lazyload
+alt="Path copying in a persistent segment tree" />
+<figcaption aria-hidden="true">Path copying in a persistent segment
+tree</figcaption>
+</figure>
+<p>You can find that a new root corresponds to a new version, and
+different versions share some nodes. Because of that, we cannot use
+<code>(idx * 2)</code> and <code>(idx * 2 + 1)</code> to calculate the
+left son and right son.</p>
+<h2 id="build-the-tree">Build The Tree</h2>
+<p>Use the Structure to maintain node information:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>&#123;<br>   <span class="hljs-type">int</span> ls, rs, v;<br>&#125;t[maxn &lt;&lt; <span class="hljs-number">5</span>];<br><span class="hljs-type">int</span> root[maxn]; <span class="hljs-comment">//Point to the root of new version</span><br><span class="hljs-type">int</span> cnt = <span class="hljs-number">0</span>; <span class="hljs-comment">//Count the number of versions</span><br></code></pre></td></tr></table></figure>
+<p>The build function is similar to an ordinary segment tree. The only
+difference is that each node is assigned a unique index using
+<code>++cnt</code>.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(node &amp;rt, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span></span>&#123;<br>    rt = ++ cnt;<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        t[rt].v = base[l];<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>  <br>    <span class="hljs-type">int</span> mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-built_in">build</span>(t[rt].ls, l, mid);<br>    <span class="hljs-built_in">build</span>(t[rt].rs, mid + <span class="hljs-number">1</span>, r);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>Here, <code>rt</code> is a <strong>reference to the node
+index</strong>, so its type should be <code>int &amp;</code>.</p>
+<p>After calling <code>build(t[rt].ls, ...)</code>, the newly allocated
+node index will be written directly into the parent node’s
+<code>ls</code> field.</p>
+<h2 id="update-the-tree">Update the Tree</h2>
+<p>Let <code>update(idx, l, r, q, val)</code> denote the following
+operation: based on the interval
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>l</mi><mo>,</mo><mi>r</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[l,r]</annotation></semantics></math>
+represented by the old node <code>idx</code>, update the value at
+position <code>q</code> to <code>val</code>, and return the index of the
+root node of the modified subtree.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">inline</span> ll <span class="hljs-title">update</span><span class="hljs-params">(ll idx, ll l, ll r, ll q, ll val)</span></span>&#123;<br>    ll current = ++cnt;<br>    t[current] = t[idx];<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        t[current].v = val;<br>        <span class="hljs-keyword">return</span> current;<br>    &#125;<br>    ll mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span>(q &lt;= mid)&#123;<br>        t[current].ls = <span class="hljs-built_in">update</span>(t[current].ls, l, mid, q, val);<br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        t[current].rs = <span class="hljs-built_in">update</span>(t[current].rs, mid + <span class="hljs-number">1</span>, r, q, val);<br>    &#125;<br>    <span class="hljs-keyword">return</span> current;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>At each level of recursion, we first execute:</p>
+<figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs excel"><span class="hljs-built_in">t</span>[current] = <span class="hljs-built_in">t</span>[idx]<br></code></pre></td></tr></table></figure>
+<p>This only copies the three integers stored in the current node. It
+does not recursively copy the entire subtree. At this point, the new
+node and the old node temporarily point to the same left and right
+children.</p>
+<p>Next, we recurse only into the side that contains <code>q</code> -
+the target path that we want to copy, and connect the returned new child
+index to <code>current</code>. The child index on the other side remains
+unchanged, which allows the two versions to <strong>share unchanged
+subtrees</strong>.</p>
+<p>Throughout the recursion, we maintain the two invariants:</p>
+<ul>
+<li>the old node is never modified</li>
+<li>in the new subtree, only the value at position <code>q</code> is
+changed.</li>
+</ul>
+<p>At the leaf node, we directly assign the new value. As the recursion
+returns, we reconnect the copied nodes along the path, eventually
+obtaining the root of the new version.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">root[i] = <span class="hljs-built_in">update</span>(root[id], <span class="hljs-number">1</span>, n, loc, val);<br></code></pre></td></tr></table></figure>
+<p>It’s not enough to copy only the leaf node, since the leaf’s parent
+must point to the new leaf, and the parent’s parent must also point to
+the new child. Therefore, the entire path from the leaf up to the root
+must be copied.</p>
+<h2 id="query">Query</h2>
+<p>Just head out from the root node, choose the left subtree or the
+right subtree according to the query position, and return the value when
+you reach the target leaf node.</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">inline</span> ll <span class="hljs-title">query</span><span class="hljs-params">(ll idx, ll l ,ll r, ll q)</span></span>&#123;<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        <span class="hljs-keyword">return</span> t[idx].v;<br>    &#125;<br>    ll mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span>(q &lt;= mid)&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">query</span>(t[idx].ls, l , mid, q);<br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">query</span>(t[idx].rs, mid + <span class="hljs-number">1</span>, r, q);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>Attention: a query also creates a new version. Since no values
+change, the new version can share the entire tree.</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs xquery">std::cout &lt;&lt; query<span class="hljs-built_in">(root</span><span class="hljs-built_in">[id</span>], <span class="hljs-number">1</span>, n, loc) &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<span class="hljs-built_in"></span><br><span class="hljs-built_in">root</span>[i] =<span class="hljs-built_in"> root</span><span class="hljs-built_in">[id</span>];<br></code></pre></td></tr></table></figure>
+<h2 id="space-complexity">Space Complexity</h2>
+<p>The initial segment tree has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+leaf nodes. Since every internal node has exactly two children, the tree
+contains a total of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>n</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">2n-1</annotation></semantics></math>
+nodes.</p>
+<p>Suppose there are
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>
+update operations. Each update copies at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">⌈</mo><msub><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mn>2</mn></msub><mi>n</mi><mo stretchy="false" form="postfix">⌉</mo><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">\lceil \log_2 n\rceil+1</annotation></semantics></math>
+nodes, including the root and the leaf. Therefore, an upper bound on the
+total number of nodes is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>2</mn><mi>n</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>u</mi><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mo stretchy="false" form="prefix">⌈</mo><msub><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mn>2</mn></msub><mi>n</mi><mo stretchy="false" form="postfix">⌉</mo><mo>+</mo><mn>1</mn><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex"> (2n-1)+u\bigl(\lceil\log_2 n\rceil+1\bigr). </annotation></semantics></math></p>
+<p>For
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>,</mo><mi>m</mi><mo>≤</mo><msup><mn>10</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">n,m\le 10^6</annotation></semantics></math>,
+each update creates at most 21 new nodes, so the total number of nodes
+is less than
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.3</mn><mo>×</mo><msup><mn>10</mn><mn>7</mn></msup></mrow><annotation encoding="application/x-tex">2.3\times10^7</annotation></semantics></math>.
+In the implementation below, we reserve <code>MAXN * 23</code> nodes for
+the node pool.</p>
+<p>The node indices, version indices, and point values in the range
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>−</mi><msup><mn>10</mn><mn>9</mn></msup><mo>,</mo><msup><mn>10</mn><mn>9</mn></msup><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[-10^9,10^9]</annotation></semantics></math>
+all fit within a 32-bit <code>int</code>. In a typical environment where
+an <code>int</code> takes 4 bytes and each node takes 12 bytes, the node
+pool uses about 263 MiB. Together with the <code>base</code> and
+<code>root</code> arrays, the three arrays use about 271 MiB in total.
+Since there are no range-sum queries in this problem, there is no need
+to use <code>long long</code> for every field.</p>
+<p>More precisely, the complexities are:</p>
+<ul>
+<li>Building the initial tree:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math>.</li>
+<li>Each update or query:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>+</mo><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(1+\log n)</annotation></semantics></math>.</li>
+<li>Total space:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mi>n</mi><mo>+</mo><mi>m</mi><mo>+</mo><mi>u</mi><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>+</mo><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mi>n</mi><mo stretchy="false" form="postfix">)</mo><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O\bigl(n+m+u(1+\log n)\bigr)</annotation></semantics></math>,
+where the <code>root</code> array itself takes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(m)</annotation></semantics></math>
+space.</li>
+</ul>
+<p>In most cases, we simply write the complexity of each operation as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(\log n)</annotation></semantics></math>,
+and the total space complexity as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mo>+</mo><mi>m</mi><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(n+m\log n)</annotation></semantics></math>.</p>
+<p>When
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">n=1</annotation></semantics></math>,
+an update still copies one leaf node.</p>
+<h2 id="code">Code</h2>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cstring&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;queue&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ll long long</span><br><br><span class="hljs-type">const</span> <span class="hljs-type">int</span> maxn = <span class="hljs-number">1e6</span> + <span class="hljs-number">514</span>;<br>ll n, m;<br>ll base[maxn];<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>&#123;<br>   ll ls, rs, v;<br>&#125;t[maxn &lt;&lt; <span class="hljs-number">5</span>];<br><span class="hljs-type">int</span> root[maxn];<br>ll cnt = <span class="hljs-number">0</span>;<br><br><span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> &amp;rt, <span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span></span>&#123;<br>    rt = ++ cnt;<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        t[rt].v = base[l];<br>        <span class="hljs-keyword">return</span>;<br>    &#125;<br>  <br>    <span class="hljs-type">int</span> mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-built_in">build</span>(t[rt].ls, l, mid);<br>    <span class="hljs-built_in">build</span>(t[rt].rs, mid + <span class="hljs-number">1</span>, r);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">inline</span> ll <span class="hljs-title">update</span><span class="hljs-params">(ll idx, ll l, ll r, ll q, ll val)</span></span>&#123;<br>    ll current = ++cnt;<br>    t[current] = t[idx];<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        t[current].v = val;<br>        <span class="hljs-keyword">return</span> current;<br>    &#125;<br>    ll mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span>(q &lt;= mid)&#123;<br>        t[current].ls = <span class="hljs-built_in">update</span>(t[current].ls, l, mid, q, val);<br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        t[current].rs = <span class="hljs-built_in">update</span>(t[current].rs, mid + <span class="hljs-number">1</span>, r, q, val);<br>    &#125;<br>    <span class="hljs-keyword">return</span> current;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">inline</span> ll <span class="hljs-title">query</span><span class="hljs-params">(ll idx, ll l ,ll r, ll q)</span></span>&#123;<br>    <span class="hljs-keyword">if</span>(l == r)&#123;<br>        <span class="hljs-keyword">return</span> t[idx].v;<br>    &#125;<br>    ll mid = l + r &gt;&gt; <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">if</span>(q &lt;= mid)&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">query</span>(t[idx].ls, l , mid, q);<br>    &#125;<br>    <span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">query</span>(t[idx].rs, mid + <span class="hljs-number">1</span>, r, q);<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    std::ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-literal">false</span>);<br>    std::cin.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>); std::cout.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br>    <br>    std::cin &gt;&gt; n &gt;&gt; m;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i)&#123;<br>        std::cin &gt;&gt; base[i];<br>    &#125;<br>    <span class="hljs-built_in">build</span>(root[<span class="hljs-number">0</span>], <span class="hljs-number">1</span>, n);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= m; ++i)&#123;<br>        <span class="hljs-type">int</span> id, type, loc;<br>        std::cin &gt;&gt; id &gt;&gt; type &gt;&gt; loc;<br>        <span class="hljs-keyword">if</span>(type == <span class="hljs-number">1</span>)&#123;<br>            ll v; std::cin &gt;&gt; v;<br>            root[i] = <span class="hljs-built_in">update</span>(root[id], <span class="hljs-number">1</span>, n, loc, v);<br>        &#125;<br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(type == <span class="hljs-number">2</span>)&#123;<br>            std::cout &lt;&lt; <span class="hljs-built_in">query</span>(root[id], <span class="hljs-number">1</span>, n, loc) &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>            root[i] = ++cnt;<br>            root[i] = root[id]<br>        &#125;<br>        <br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Competitive-Coding/" class="category-chain-item">Competitive Coding</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Data-Structure/" class="print-no-link">#Data Structure</a>
+      
+        <a href="/tags/Segment-Tree/" class="print-no-link">#Segment Tree</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Persistent Data Structure - Segment Tree</div>
+      <div>https://m1ku319.github.io/2026/10/07/persistent-segment-tree/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>M1KU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>October 7, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/10/03/Convex%20Hull%20Trick/" title="Convex Hull Trick">
+                        <span class="hidden-mobile">Convex Hull Trick</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liQ7e35dsru6W7gx","clientSecret":"580874ca2a35fa61bd6f1a399c8b476b9c7e5e18","repo":"blog-comment","owner":"M1KU319","admin":["M1KU319"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '3400c7b27d37a25ea64ad7ecafa2d817'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
