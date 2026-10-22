@@ -1,0 +1,890 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/favicon.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="M1KU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在 EK 中，每次 BFS 找到一条增广路，推完流量以后就重新搜索。问题是，这次 BFS 已经找到了很多点的最短距离，最后只用上一条路径，多少有点可惜。 能不能保留这次搜索的结果，把同样长度的增广路多找几条，再重新 BFS？Dinic 就沿着这个想法继续做。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dinic &amp; 二分图最大匹配">
+<meta property="og:url" content="https://m1ku319.github.io/dinic-bipartite-matching/index.html">
+<meta property="og:site_name" content="M1KU&#39;s Blog">
+<meta property="og:description" content="在 EK 中，每次 BFS 找到一条增广路，推完流量以后就重新搜索。问题是，这次 BFS 已经找到了很多点的最短距离，最后只用上一条路径，多少有点可惜。 能不能保留这次搜索的结果，把同样长度的增广路多找几条，再重新 BFS？Dinic 就沿着这个想法继续做。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://m1ku319.github.io/images/network-flow/02-bipartite.svg">
+<meta property="article:published_time" content="2026-06-29T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T19:50:06.127Z">
+<meta property="article:author" content="M1KU">
+<meta property="article:tag" content="Bipartite Matching">
+<meta property="article:tag" content="Graph Theory">
+<meta property="article:tag" content="Network Flow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://m1ku319.github.io/images/network-flow/02-bipartite.svg">
+  
+  
+  
+  <title>Dinic &amp; 二分图最大匹配 - M1KU&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"m1ku319.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>M1KU</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Dinic &amp; 二分图最大匹配"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-30 00:00" pubdate>
+          June 30, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Dinic &amp; 二分图最大匹配</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>在 <a href="/network-flow-basics-max-flow/">EK</a> 中，每次 BFS
+找到一条增广路，推完流量以后就重新搜索。问题是，这次 BFS
+已经找到了很多点的最短距离，最后只用上一条路径，多少有点可惜。</p>
+<p>能不能保留这次搜索的结果，把同样长度的增广路多找几条，再重新
+BFS？Dinic 就沿着这个想法继续做。</p>
+<span id="more"></span>
+<h2 id="先把残量网络分层">先把残量网络分层</h2>
+<p>令 <code>level[u]</code> 表示从源点到 <code>u</code>
+最少经过几条残量边。BFS 仍然只走残余容量大于零的边，得到层数以后，DFS
+再加一个限制。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">level[v] == level[u] + <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<p>也就是每次只能往下一层走。由这些边组成的图称为层次图。</p>
+<p>这样走到汇点时，经过的边数一定等于
+<code>level[t]</code>，正好是一条最短增广路。层数沿路径严格增加，DFS
+也不会在环里绕回来，不需要再维护普通 DFS 的 <code>vis</code> 数组。</p>
+<p>这里的分层对象是<strong>当前残量网络</strong>。原边和反向边都参与
+BFS，只要有剩余容量就可以走。假如反向边在这一轮恰好从第
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+层通向第
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k+1</annotation></semantics></math>
+层，它同样可以进入层次图。</p>
+<h2 id="一轮-bfs-能用多久">一轮 BFS 能用多久</h2>
+<p>固定层数以后，反复从源点 DFS，每次找到一条路径就推送瓶颈流量，直到
+DFS 返回 <code>0</code>。</p>
+<p>此时本轮层次图中的每条源汇路径都至少有一条边被用满，已经无法继续沿着层数递增的方向增广。这一轮送出的流量称为<strong>阻塞流</strong>。</p>
+<p>阻塞流只要求把当前这些路径堵住，并不要求求出层次图自身的最大流。后者可能需要撤销本轮先前的选择，而撤销操作会经过反向边，离开当前允许的分层方向。</p>
+<p>下一轮再对更新后的残量网络
+BFS。旧的最短路径全部被堵住，若还存在增广路，它的长度就会增加。层数最多到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">V-1</annotation></semantics></math>，因此最多进行
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V)</annotation></semantics></math>
+轮分层。</p>
+<p>从代码上看，就是两个 <code>while</code>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">while</span>(<span class="hljs-built_in">bfs</span>())&#123;<br>    cur.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), <span class="hljs-number">0</span>);<br>    ll pushed;<br>    <span class="hljs-keyword">while</span>((pushed = <span class="hljs-built_in">dfs</span>(s, LLONG_MAX)) &gt; <span class="hljs-number">0</span>)&#123;<br>        ans += pushed;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>内层把当前分层用完，外层负责重新分层。DFS
+一次只返回一条路的流量就够了，不必为了叫“阻塞流”而在一次递归里硬塞下所有路径。</p>
+<h2 id="当前弧为什么能一直往后走">当前弧为什么能一直往后走</h2>
+<p>如果每次进入 <code>u</code>
+都从第一条出边开始试，前面已经走不通的边会被检查很多遍。于是为每个点维护
+<code>cur[u]</code>，记录下一条需要尝试的边在 <code>id[u]</code>
+中的位置。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> &amp;i = cur[u]; i &lt; (<span class="hljs-type">int</span>)id[u].<span class="hljs-built_in">size</span>(); ++i)<br></code></pre></td></tr></table></figure>
+<p>这里的 <code>&amp;</code> 要保留。循环里修改
+<code>i</code>，也就修改了 <code>cur[u]</code>，下一次进入
+<code>u</code> 时才能接着往下找。</p>
+<p>为什么已经失败的边可以跳过？看一次沿层次图的增广。正向残余容量减少，新增加的反向容量指向上一层，不能在本轮
+DFS
+中使用。因此，本轮可用的向前边只会减少，不会凭空增加。一个点的后续路径已经全部走不通，继续增广也不能让它重新通向汇点。</p>
+<p>成功推流时，当前边可能还有容量，所以直接
+<code>return pushed</code>，让指针留在这条边上。只有它被用满，或者它后面再也到不了汇点，循环才继续往后走。</p>
+<p>这个判断依赖固定的 <code>level</code>。下一轮 BFS 改了层数，所有
+<code>cur</code> 都要归零。</p>
+<h2 id="用-dinic-求二分图最大匹配">用 Dinic 求二分图最大匹配</h2>
+<p>设左部有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>L</mi></msub><annotation encoding="application/x-tex">n_L</annotation></semantics></math>
+个点，右部有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>n</mi><mi>R</mi></msub><annotation encoding="application/x-tex">n_R</annotation></semantics></math>
+个点。每条允许的配对连接左右两侧，要求每个点最多被选一次，并让配对数量最多。</p>
+<p>先从“一对匹配”入手。让一单位流量经过一个左部点、一个右部点，再到汇点，它就可以代表选择这一对。</p>
+<figure>
+<img src="/images/network-flow/02-bipartite.svg" srcset="/img/loading.gif" lazyload
+alt="二分图匹配的网络流建模" />
+<figcaption aria-hidden="true">二分图匹配的网络流建模</figcaption>
+</figure>
+<p>图中只画原边，建图时每条边仍要配上残量反边。所有原边容量都是
+<code>1</code>。</p>
+<table>
+<thead>
+<tr>
+<th>连边</th>
+<th>限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s -&gt; u</code></td>
+<td>左部点 <code>u</code> 最多参与一次匹配</td>
+</tr>
+<tr>
+<td><code>u -&gt; nL+v</code></td>
+<td>允许选择配对 <code>(u,v)</code></td>
+</tr>
+<tr>
+<td><code>nL+v -&gt; t</code></td>
+<td>右部点 <code>v</code> 最多参与一次匹配</td>
+</tr>
+</tbody>
+</table>
+<p>两侧在题目里都可能从 <code>1</code> 开始编号，所以右侧统一加上
+<code>nL</code>。取
+<code>s=0</code>、<code>t=nL+nR+1</code>，整个网络需要
+<code>nL+nR+2</code> 个点。</p>
+<p>每个合法匹配都能变成相同大小的整数流。反过来，算法从零流开始，每次增广整数流量，容量为
+<code>1</code> 的配对边最终只会流过 <code>0</code> 或 <code>1</code>
+单位；源点和汇点一侧的容量又保证了每个点最多使用一次。这样，整数流也能还原成匹配，最大流量就是最大匹配数。</p>
+<h3 id="反向边在匹配里做了什么">反向边在匹配里做了什么</h3>
+<p>只考虑三条允许的配对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_1</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_2</annotation></semantics></math>、<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>2</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_2R_1</annotation></semantics></math>。如果先选了
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_1</annotation></semantics></math>，下一轮可以找到残量路径</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><msub><mi>L</mi><mn>2</mn></msub><mo>→</mo><msub><mi>R</mi><mn>1</mn></msub><mo>→</mo><msub><mi>L</mi><mn>1</mn></msub><mo>→</mo><msub><mi>R</mi><mn>2</mn></msub><mo>→</mo><mi>t</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
+s\to L_2\to R_1\to L_1\to R_2\to t.
+</annotation></semantics></math></p>
+<p>其中
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>R</mi><mn>1</mn></msub><mo>→</mo><msub><mi>L</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">R_1\to L_1</annotation></semantics></math>
+是反向边。走过它会撤销原来的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_1</annotation></semantics></math>，随后改成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>2</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_2R_1</annotation></semantics></math>
+和
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_2</annotation></semantics></math>，匹配数从
+<code>1</code> 增加到 <code>2</code>。</p>
+<p>这也解释了为什么不能看到某条配对边曾经流过，就立刻把它记成最终答案。要等最大流跑完，再检查残量。</p>
+<h2 id="完整代码">完整代码</h2>
+<p>下面使用 C++17，保留 <code>e + id</code> 的邻接表写法。输入
+<code>nL nR m</code>，随后输入
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+行 <code>u v</code>，表示允许左侧 <code>u</code> 与右侧 <code>v</code>
+配对。两侧编号分别属于 <code>[1,nL]</code> 和
+<code>[1,nR]</code>。输出第一行是最大匹配数，后面每行输出一对匹配。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;queue&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;climits&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-keyword">using</span> ll = <span class="hljs-type">long</span> <span class="hljs-type">long</span>;<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Edge</span>&#123;<br>    <span class="hljs-type">int</span> v;<br>    ll c;<br>&#125;;<br><br>vector&lt;Edge&gt; e;<br>vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; id;<br>vector&lt;<span class="hljs-type">int</span>&gt; level, cur;<br><span class="hljs-type">int</span> s, t;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">init_graph</span><span class="hljs-params">(<span class="hljs-type">int</span> N)</span></span>&#123;<br>    e.<span class="hljs-built_in">clear</span>();<br>    id.<span class="hljs-built_in">assign</span>(N, &#123;&#125;);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> u, <span class="hljs-type">int</span> v, ll c)</span></span>&#123;<br>    <span class="hljs-type">int</span> idx = (<span class="hljs-type">int</span>)e.<span class="hljs-built_in">size</span>();<br>    e.<span class="hljs-built_in">push_back</span>(&#123;v, c&#125;);<br>    e.<span class="hljs-built_in">push_back</span>(&#123;u, <span class="hljs-number">0</span>&#125;);<br>    id[u].<span class="hljs-built_in">push_back</span>(idx);<br>    id[v].<span class="hljs-built_in">push_back</span>(idx ^ <span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">return</span> idx;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">bfs</span><span class="hljs-params">()</span></span>&#123;<br>    level.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), <span class="hljs-number">-1</span>);<br>    queue&lt;<span class="hljs-type">int</span>&gt; q;<br>    q.<span class="hljs-built_in">push</span>(s);<br>    level[s] = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>        <span class="hljs-type">int</span> u = q.<span class="hljs-built_in">front</span>();<br>        q.<span class="hljs-built_in">pop</span>();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> idx : id[u])&#123;<br>            <span class="hljs-type">int</span> v = e[idx].v;<br>            <span class="hljs-keyword">if</span>(e[idx].c &lt;= <span class="hljs-number">0</span> || level[v] != <span class="hljs-number">-1</span>) <span class="hljs-keyword">continue</span>;<br>            level[v] = level[u] + <span class="hljs-number">1</span>;<br>            q.<span class="hljs-built_in">push</span>(v);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> level[t] != <span class="hljs-number">-1</span>;<br>&#125;<br><br><span class="hljs-function">ll <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> u, ll lim)</span></span>&#123;<br>    <span class="hljs-keyword">if</span>(u == t) <span class="hljs-keyword">return</span> lim;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> &amp;i = cur[u]; i &lt; (<span class="hljs-type">int</span>)id[u].<span class="hljs-built_in">size</span>(); ++i)&#123;<br>        <span class="hljs-type">int</span> idx = id[u][i];<br>        <span class="hljs-type">int</span> v = e[idx].v;<br>        <span class="hljs-keyword">if</span>(e[idx].c &lt;= <span class="hljs-number">0</span> || level[v] != level[u] + <span class="hljs-number">1</span>) <span class="hljs-keyword">continue</span>;<br><br>        ll pushed = <span class="hljs-built_in">dfs</span>(v, <span class="hljs-built_in">min</span>(lim, e[idx].c));<br>        <span class="hljs-keyword">if</span>(pushed &gt; <span class="hljs-number">0</span>)&#123;<br>            e[idx].c -= pushed;<br>            e[idx ^ <span class="hljs-number">1</span>].c += pushed;<br>            <span class="hljs-keyword">return</span> pushed;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><br><span class="hljs-function">ll <span class="hljs-title">dinic</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-keyword">if</span>(s == t) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    ll ans = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">while</span>(<span class="hljs-built_in">bfs</span>())&#123;<br>        cur.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), <span class="hljs-number">0</span>);<br>        ll pushed;<br>        <span class="hljs-keyword">while</span>((pushed = <span class="hljs-built_in">dfs</span>(s, LLONG_MAX)) &gt; <span class="hljs-number">0</span>)&#123;<br>            ans += pushed;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> ans;<br>&#125;<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Candidate</span>&#123;<br>    <span class="hljs-type">int</span> u, v, idx;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-literal">false</span>);<br>    cin.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br><br>    <span class="hljs-type">int</span> nL, nR, m;<br>    cin &gt;&gt; nL &gt;&gt; nR &gt;&gt; m;<br>    s = <span class="hljs-number">0</span>;<br>    t = nL + nR + <span class="hljs-number">1</span>;<br>    <span class="hljs-built_in">init_graph</span>(t + <span class="hljs-number">1</span>);<br><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> u = <span class="hljs-number">1</span>; u &lt;= nL; ++u) <span class="hljs-built_in">add</span>(s, u, <span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v = <span class="hljs-number">1</span>; v &lt;= nR; ++v) <span class="hljs-built_in">add</span>(nL + v, t, <span class="hljs-number">1</span>);<br><br>    vector&lt;Candidate&gt; candidate;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; m; ++i)&#123;<br>        <span class="hljs-type">int</span> u, v;<br>        cin &gt;&gt; u &gt;&gt; v;<br>        <span class="hljs-type">int</span> idx = <span class="hljs-built_in">add</span>(u, nL + v, <span class="hljs-number">1</span>);<br>        candidate.<span class="hljs-built_in">push_back</span>(&#123;u, v, idx&#125;);<br>    &#125;<br><br>    cout &lt;&lt; <span class="hljs-built_in">dinic</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span> ed : candidate)&#123;<br>        <span class="hljs-keyword">if</span>(e[ed.idx ^ <span class="hljs-number">1</span>].c == <span class="hljs-number">1</span>)&#123;<br>            cout &lt;&lt; ed.u &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span> &lt;&lt; ed.v &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>配对边初始容量为 <code>1</code>，反边初始容量为
+<code>0</code>，所以最终 <code>e[idx ^ 1].c == 1</code>
+就表示选中了这条边。数组大小按 <code>id.size()</code>
+分配，左右两侧以及额外的源汇点都会被算进去；只按原题的 <code>n+1</code>
+分配，右侧点很容易越界。</p>
+<p>上面的核心也能用于一般最大流，只需重新设置源汇并按原容量建图。容量须非负，总流量须能用
+<code>ll</code> 表示。深层图上的递归深度可能达到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V)</annotation></semantics></math>，数据规模很大时还要留意栈空间。</p>
+<p>如果题目限制“经过点 <code>u</code> 的流量不能超过
+<code>b</code>”，可以把它拆成 <code>u_in</code> 和
+<code>u_out</code>，中间连一条容量为 <code>b</code> 的边。原来的入边接到
+<code>u_in</code>，出边从 <code>u_out</code>
+出发，经过这个点的流量就都受中间这条边限制。点容量也就转成了边容量。</p>
+<h2 id="复杂度与阈值匹配">复杂度与阈值匹配</h2>
+<p>一般网络中，一轮阻塞流最多增广
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(E)</annotation></semantics></math>
+次，每条路径长度为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V)</annotation></semantics></math>；当前弧把失败的边扫描控制在本轮
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(E)</annotation></semantics></math>
+次。加上最多
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V)</annotation></semantics></math>
+轮分层，时间复杂度为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><msup><mi>V</mi><mn>2</mn></msup><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V^2E)</annotation></semantics></math>，空间为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E)</annotation></semantics></math>。</p>
+<p>二分图匹配对应的标准单位网络可以进一步做到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><msqrt><mi>V</mi></msqrt><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(E\sqrt V)</annotation></semantics></math>，这里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>
+包括源点和汇点的连边。这个界依赖匹配网络的结构，不能直接套给所有“边容量都是
+<code>1</code>”的网络。</p>
+<p>之前那种给配对附上时间
+<code>d</code>、要求尽早完成全部匹配的题，也可以继续用这份建图。检查答案
+<code>lim</code> 时，只加入 <code>d &lt;= lim</code>
+的配对边，再看最大流是否等于需要匹配的点数。可用边随 <code>lim</code>
+增大而增加，判定满足单调性，可以二分答案。</p>
+<p>每次 <code>check</code>
+要重新建图，或者恢复初始残量容量。上一次检查留下的流量会影响下一次结果。</p>
+<p>这里优化的是所有选中配对中最大的时间。若题目改成最小化总费用，目标就变了，下一篇再用<a
+href="/min-cost-flow-weighted-matching/">费用流与带权匹配</a>处理。</p>
+<p>参考 <a
+target="_blank" rel="noopener" href="https://courses.csail.mit.edu/6.854/20/Notes/n10-blocking_flows.html">MIT
+的 Blocking Flows 讲义</a>。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Competitive-Coding/" class="category-chain-item">Competitive Coding</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Graph-Theory/" class="print-no-link">#Graph Theory</a>
+      
+        <a href="/tags/Network-Flow/" class="print-no-link">#Network Flow</a>
+      
+        <a href="/tags/Bipartite-Matching/" class="print-no-link">#Bipartite Matching</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Dinic &amp; 二分图最大匹配</div>
+      <div>https://m1ku319.github.io/dinic-bipartite-matching/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>M1KU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>June 30, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/min-cost-flow-weighted-matching/" title="费用流 &amp; 二分图带权匹配">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">费用流 &amp; 二分图带权匹配</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/network-flow-basics-max-flow/" title="网络流初步 &amp; 最大流">
+                        <span class="hidden-mobile">网络流初步 &amp; 最大流</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liQ7e35dsru6W7gx","clientSecret":"580874ca2a35fa61bd6f1a399c8b476b9c7e5e18","repo":"blog-comment","owner":"M1KU319","admin":["M1KU319"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'fac9f318e733ed45dbf34c1824bddc38'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

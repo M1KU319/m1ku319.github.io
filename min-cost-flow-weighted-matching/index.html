@@ -1,0 +1,968 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/favicon.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="M1KU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="上一篇把二分图匹配转成了最大流。一单位流量代表一对匹配，容量限制保证每个点最多被选一次。如果每对匹配还有不同的收益，选择哪些边也会影响答案。 费用流给每条边再加一个单位费用。增广和反向边的操作仍然保留，只是找路径时，多了一笔要算的账。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="费用流 &amp; 二分图带权匹配">
+<meta property="og:url" content="https://m1ku319.github.io/min-cost-flow-weighted-matching/index.html">
+<meta property="og:site_name" content="M1KU&#39;s Blog">
+<meta property="og:description" content="上一篇把二分图匹配转成了最大流。一单位流量代表一对匹配，容量限制保证每个点最多被选一次。如果每对匹配还有不同的收益，选择哪些边也会影响答案。 费用流给每条边再加一个单位费用。增广和反向边的操作仍然保留，只是找路径时，多了一笔要算的账。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://m1ku319.github.io/images/network-flow/03-weighted.svg">
+<meta property="article:published_time" content="2026-07-16T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T19:50:06.129Z">
+<meta property="article:author" content="M1KU">
+<meta property="article:tag" content="Bipartite Matching">
+<meta property="article:tag" content="Graph Theory">
+<meta property="article:tag" content="Network Flow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://m1ku319.github.io/images/network-flow/03-weighted.svg">
+  
+  
+  
+  <title>费用流 &amp; 二分图带权匹配 - M1KU&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"m1ku319.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>M1KU</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="费用流 &amp; 二分图带权匹配"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-17 00:00" pubdate>
+          July 17, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">费用流 &amp; 二分图带权匹配</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><a
+href="/dinic-bipartite-matching/">上一篇</a>把二分图匹配转成了最大流。一单位流量代表一对匹配，容量限制保证每个点最多被选一次。如果每对匹配还有不同的收益，选择哪些边也会影响答案。</p>
+<p>费用流给每条边再加一个单位费用。增广和反向边的操作仍然保留，只是找路径时，多了一笔要算的账。</p>
+<span id="more"></span>
+<h2 id="先把目标说清楚">先把目标说清楚</h2>
+<p>最小费用最大流的优先级是<strong>流量最大，其次费用最小</strong>。假设两种方案的流量分别为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+和
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>，即使后者贵一些，仍然选择流量为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>
+的方案。</p>
+<p>有些题目已经规定必须完成
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+项任务，这时流量固定为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>，只比较费用。能送出的最大流不足
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+就无解，不能拿当前费用当答案。</p>
+<p>设原边
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
+的流量为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>e</mi></msub><annotation encoding="application/x-tex">f_e</annotation></semantics></math>，单位费用为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mi>e</mi></msub><annotation encoding="application/x-tex">w_e</annotation></semantics></math>，总费用为</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mrow><mi>e</mi><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>f</mi><mi>e</mi></msub><msub><mi>w</mi><mi>e</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\sum_{e\in E} f_e w_e.
+</annotation></semantics></math></p>
+<p>这里的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mi>e</mi></msub><annotation encoding="application/x-tex">w_e</annotation></semantics></math>
+是每单位流量的费用。一次增广推了
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+单位，路径每单位费用为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>，答案应该增加
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>15</mn><annotation encoding="application/x-tex">15</annotation></semantics></math>。</p>
+<p>沿用之前的邻接表，只需给 <code>Edge</code> 加上
+<code>w</code>。<code>c</code>
+继续表示残余容量，不能因为多了一个费用就把两者混起来。</p>
+<h2 id="反向边也要退费">反向边也要退费</h2>
+<p>最大流中，走反向边可以撤销之前送出的流量。现在原边上每送一单位需要支付
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>，撤销时就要退回
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>，所以反向边的费用是
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mi>w</mi></mrow><annotation encoding="application/x-tex">-w</annotation></semantics></math>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++">e.<span class="hljs-built_in">push_back</span>(&#123;v, c, w&#125;);<br>e.<span class="hljs-built_in">push_back</span>(&#123;u, <span class="hljs-number">0</span>, -w&#125;);<br></code></pre></td></tr></table></figure>
+<p>反边仍然从容量 <code>0</code>
+开始，正向边流过多少，才允许撤销多少。若题目原图本来就有两个相反方向的边，需要分别
+<code>add()</code>，各自建立自己的残量反边。</p>
+<p>这也让最短路变得稍微麻烦了一点。即使输入费用全部非负，增广之后仍然可能出现有正残量的负费用反边，直接把原费用丢给
+Dijkstra 就不行了。</p>
+<h2 id="从最短增广路入手">从最短增广路入手</h2>
+<p><a href="/network-flow-basics-max-flow/">EK</a>用 BFS
+找边数最少的增广路。费用流比较的是沿途费用之和，所以要在残量网络中找<strong>费用最小的源汇路径</strong>。</p>
+<p>每找到一条路径，就取沿途残余容量的最小值作为增广量，再更新正反边。路径中可以有反向边，它们会把之前某些选择的费用抵消掉。</p>
+<p>在初始残量网络没有负费用环的前提下，沿最短费用增广路推流，可以保持当前流量下的费用最优。一直推到无法到达汇点，就得到最小费用最大流。</p>
+<p>固定流量下，两个可行方案的差可以在残量网络中分解成若干个环。如果存在费用更低的方案，其中至少有一个环的费用为负；反过来，沿负费用环调整流量，也能在流量不变时降低费用。最短路增广会保持残量网络中没有负费用环，这保证了每一步的最优性。后面的势能也能用来理解这个条件。</p>
+<p>最直接的实现是每轮跑 SPFA，它能处理负费用边。SPFA 的最坏复杂度为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(VE)</annotation></semantics></math>，每次增广都来一遍，会把时间花在重复的最短路上。这里使用初始
+SPFA 加势能 Dijkstra，反向边仍然按原规则维护。</p>
+<h2 id="用势能调整边权">用势能调整边权</h2>
+<p>给每个点维护一个势能 <code>h[u]</code>，搜索时把边权改成</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>w</mi><mo>′</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>w</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>u</mi><mo stretchy="false" form="postfix">]</mo><mo>−</mo><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>v</mi><mo stretchy="false" form="postfix">]</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+w&#39;(u,v)=w(u,v)+h[u]-h[v].
+</annotation></semantics></math></p>
+<p>先看这样改会不会把最短路改掉。一条从
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+的路径上，中间点的势能一加一减恰好抵消，最后只剩</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><msup><mi>w</mi><mo>′</mo></msup><mo>=</mo><mo>∑</mo><mi>w</mi><mo>+</mo><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>s</mi><mo stretchy="false" form="postfix">]</mo><mo>−</mo><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>t</mi><mo stretchy="false" form="postfix">]</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\sum w&#39; = \sum w+h[s]-h[t].
+</annotation></semantics></math></p>
+<p>所有源汇路径都加上同一个数，费用大小关系不变。接下来只要让搜索涉及的
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>w</mi><mo>′</mo></msup><annotation encoding="application/x-tex">w&#39;</annotation></semantics></math>
+非负，就可以用 Dijkstra。</p>
+<p>第一次用 SPFA 求源点到各个可达点的最短距离，并令 <code>h[v]</code>
+等于这个距离。由最短路的三角不等式</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>v</mi><mo stretchy="false" form="postfix">]</mo><mo>≤</mo><mi>h</mi><mo stretchy="false" form="prefix">[</mo><mi>u</mi><mo stretchy="false" form="postfix">]</mo><mo>+</mo><mi>w</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
+h[v]\le h[u]+w(u,v),
+</annotation></semantics></math></p>
+<p>可以得到可达部分的正残量边满足
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>w</mi><mo>′</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">w&#39;(u,v)\ge0</annotation></semantics></math>。如果一开始所有正残量边的费用都非负，直接令势能全为
+<code>0</code> 即可。</p>
+<p>之后每轮 Dijkstra 得到调整费用下的距离
+<code>dist</code>，对所有可达点执行</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">h[v] += dist[v];<br></code></pre></td></tr></table></figure>
+<p>新的调整费用为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>w</mi><mo>′</mo></msup><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>d</mi><mi>i</mi><mi>s</mi><mi>t</mi><mo stretchy="false" form="prefix">[</mo><mi>u</mi><mo stretchy="false" form="postfix">]</mo><mo>−</mo><mi>d</mi><mi>i</mi><mi>s</mi><mi>t</mi><mo stretchy="false" form="prefix">[</mo><mi>v</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">w&#39;(u,v)+dist[u]-dist[v]</annotation></semantics></math>，仍然非负。最短路上的边在更新后调整费用为
+<code>0</code>，增广新产生的反边也为 <code>0</code>，下一轮还能继续用
+Dijkstra。</p>
+<p>实现时有两个地方要分开看。<code>dist[t]</code>
+是调整后的费用，不能直接乘流量加进答案；下面沿 <code>pre</code>
+回溯，累加原始 <code>w</code> 得到
+<code>path_cost</code>。此外，既然后面要用所有可达点的距离更新势能，就让
+Dijkstra 完整跑完，不在弹出汇点时提前返回。</p>
+<h2 id="费用流模板">费用流模板</h2>
+<p><code>pre[v]</code> 保存进入 <code>v</code>
+的边编号，重边也能准确更新。<code>need</code>
+表示本次最多增加多少流量，返回值是本次增加的流量与费用。</p>
+<p>代码里的 <code>only_negative</code>
+用于后面的可选匹配问题，普通最小费用最大流保持默认
+<code>false</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;queue&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;functional&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;climits&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cassert&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-keyword">using</span> ll = <span class="hljs-type">long</span> <span class="hljs-type">long</span>;<br><span class="hljs-type">const</span> ll INF = LLONG_MAX / <span class="hljs-number">4</span>;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Edge</span> &#123;<br>    <span class="hljs-type">int</span> v;<br>    ll c;  <span class="hljs-comment">// 残余容量</span><br>    ll w;  <span class="hljs-comment">// 单位费用</span><br>&#125;;<br>vector&lt;Edge&gt; e;<br>vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; id;<br>vector&lt;ll&gt; h, dist;<br>vector&lt;<span class="hljs-type">int</span>&gt; pre;<br><span class="hljs-type">int</span> s, t;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">init_graph</span><span class="hljs-params">(<span class="hljs-type">int</span> N)</span> </span>&#123;<br>    e.<span class="hljs-built_in">clear</span>();<br>    id.<span class="hljs-built_in">assign</span>(N, &#123;&#125;);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> u, <span class="hljs-type">int</span> v, ll c, ll w)</span> </span>&#123;<br>    <span class="hljs-type">int</span> idx = (<span class="hljs-type">int</span>)e.<span class="hljs-built_in">size</span>();<br>    e.<span class="hljs-built_in">push_back</span>(&#123;v, c, w&#125;);<br>    e.<span class="hljs-built_in">push_back</span>(&#123;u, <span class="hljs-number">0</span>, -w&#125;);<br>    id[u].<span class="hljs-built_in">push_back</span>(idx);<br>    id[v].<span class="hljs-built_in">push_back</span>(idx ^ <span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">return</span> idx;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">init_potential</span><span class="hljs-params">()</span> </span>&#123;<br>    h.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), <span class="hljs-number">0</span>);<br>    <span class="hljs-type">bool</span> has_negative = <span class="hljs-literal">false</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;ed : e) &#123;<br>        <span class="hljs-keyword">if</span> (ed.c &gt; <span class="hljs-number">0</span> &amp;&amp; ed.w &lt; <span class="hljs-number">0</span>) &#123;<br>            has_negative = <span class="hljs-literal">true</span>;<br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">if</span> (!has_negative) <span class="hljs-keyword">return</span>;<br>    dist.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), INF);<br>    <span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">inq</span><span class="hljs-params">(id.size(), <span class="hljs-number">0</span>)</span></span>;<br>    queue&lt;<span class="hljs-type">int</span>&gt; q;<br>    dist[s] = <span class="hljs-number">0</span>;<br>    q.<span class="hljs-built_in">push</span>(s);<br>    inq[s] = <span class="hljs-number">1</span>;<br>    <span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>()) &#123;<br>        <span class="hljs-type">int</span> u = q.<span class="hljs-built_in">front</span>();<br>        q.<span class="hljs-built_in">pop</span>();<br>        inq[u] = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> idx : id[u]) &#123;<br>            <span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;ed = e[idx];<br>            <span class="hljs-keyword">if</span> (ed.c &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;<br>            <span class="hljs-type">int</span> v = ed.v;<br>            ll nd = dist[u] + ed.w;<br>            <span class="hljs-keyword">if</span> (nd &gt;= dist[v]) <span class="hljs-keyword">continue</span>;<br>            dist[v] = nd;<br>            <span class="hljs-keyword">if</span> (!inq[v]) &#123;<br>                q.<span class="hljs-built_in">push</span>(v);<br>                inq[v] = <span class="hljs-number">1</span>;<br>            &#125;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v = <span class="hljs-number">0</span>; v &lt; (<span class="hljs-type">int</span>)id.<span class="hljs-built_in">size</span>(); ++v) &#123;<br>        <span class="hljs-keyword">if</span> (dist[v] != INF) h[v] = dist[v];<br>    &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">dijkstra</span><span class="hljs-params">()</span> </span>&#123;<br>    dist.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), INF);<br>    pre.<span class="hljs-built_in">assign</span>(id.<span class="hljs-built_in">size</span>(), <span class="hljs-number">-1</span>);<br>    priority_queue&lt;pair&lt;ll, <span class="hljs-type">int</span>&gt;,<br>                   vector&lt;pair&lt;ll, <span class="hljs-type">int</span>&gt;&gt;,<br>                   greater&lt;pair&lt;ll, <span class="hljs-type">int</span>&gt;&gt;&gt; q;<br>    dist[s] = <span class="hljs-number">0</span>;<br>    q.<span class="hljs-built_in">push</span>(&#123;<span class="hljs-number">0</span>, s&#125;);<br>    <span class="hljs-keyword">while</span> (!q.<span class="hljs-built_in">empty</span>()) &#123;<br>        <span class="hljs-keyword">auto</span> [du, u] = q.<span class="hljs-built_in">top</span>();<br>        q.<span class="hljs-built_in">pop</span>();<br>        <span class="hljs-keyword">if</span> (du != dist[u]) <span class="hljs-keyword">continue</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> idx : id[u]) &#123;<br>            <span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;ed = e[idx];<br>            <span class="hljs-keyword">if</span> (ed.c &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;<br>            <span class="hljs-type">int</span> v = ed.v;<br>            ll reduced = ed.w + h[u] - h[v];<br>            <span class="hljs-built_in">assert</span>(reduced &gt;= <span class="hljs-number">0</span>);<br>            ll nd = du + reduced;<br>            <span class="hljs-keyword">if</span> (nd &lt; dist[v]) &#123;<br>                dist[v] = nd;<br>                pre[v] = idx;<br>                q.<span class="hljs-built_in">push</span>(&#123;nd, v&#125;);<br>            &#125;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> pre[t] != <span class="hljs-number">-1</span>;<br>&#125;<br><br><span class="hljs-function">pair&lt;ll, ll&gt; <span class="hljs-title">min_cost_flow</span><span class="hljs-params">(ll need = LLONG_MAX,</span></span><br><span class="hljs-params"><span class="hljs-function">                           <span class="hljs-type">bool</span> only_negative = <span class="hljs-literal">false</span>)</span> </span>&#123;<br>    ll flow = <span class="hljs-number">0</span>, cost = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (s == t || need &lt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> &#123;<span class="hljs-number">0</span>, <span class="hljs-number">0</span>&#125;;<br>    <span class="hljs-built_in">init_potential</span>();<br>    <span class="hljs-keyword">while</span> (flow &lt; need &amp;&amp; <span class="hljs-built_in">dijkstra</span>()) &#123;<br>        ll pushed = need - flow;<br>        ll path_cost = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v = t; v != s; v = e[pre[v] ^ <span class="hljs-number">1</span>].v) &#123;<br>            <span class="hljs-type">int</span> idx = pre[v];<br>            pushed = <span class="hljs-built_in">min</span>(pushed, e[idx].c);<br>            path_cost += e[idx].w;  <span class="hljs-comment">// 累加原费用，不使用调整后的费用</span><br>        &#125;<br>        <span class="hljs-keyword">if</span> (only_negative &amp;&amp; path_cost &gt;= <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v = <span class="hljs-number">0</span>; v &lt; (<span class="hljs-type">int</span>)id.<span class="hljs-built_in">size</span>(); ++v) &#123;<br>            <span class="hljs-keyword">if</span> (dist[v] != INF) h[v] += dist[v];<br>        &#125;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v = t; v != s; v = e[pre[v] ^ <span class="hljs-number">1</span>].v) &#123;<br>            <span class="hljs-type">int</span> idx = pre[v];<br>            e[idx].c -= pushed;<br>            e[idx ^ <span class="hljs-number">1</span>].c += pushed;<br>        &#125;<br>        flow += pushed;<br>        cost += pushed * path_cost;<br>    &#125;<br>    <span class="hljs-keyword">return</span> &#123;flow, cost&#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>建图后调用 <code>min_cost_flow()</code>
+即可求最小费用最大流。若要求恰好
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+单位，调用 <code>min_cost_flow(K)</code> 并检查返回的
+<code>flow == K</code>，要求
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>K</mi><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">K\ge0</annotation></semantics></math>。</p>
+<h2 id="给二分图匹配加上权值">给二分图匹配加上权值</h2>
+<p>源点、左右两侧和汇点的编号沿用上一篇。假设配对
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(u,v)</annotation></semantics></math>
+的收益为 <code>weight</code>，只需把对应边的费用设为
+<code>-weight</code>。</p>
+<table>
+<thead>
+<tr>
+<th>连边</th>
+<th>容量</th>
+<th>费用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s -&gt; u</code></td>
+<td><code>1</code></td>
+<td><code>0</code></td>
+</tr>
+<tr>
+<td><code>u -&gt; nL+v</code></td>
+<td><code>1</code></td>
+<td><code>-weight</code></td>
+</tr>
+<tr>
+<td><code>nL+v -&gt; t</code></td>
+<td><code>1</code></td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<p>一单位流量对应一对匹配，总收益为
+<code>-cost</code>。这张图的初始正残量边从源点经过左部、右部，再到汇点，没有有向环，也就没有负费用环。</p>
+<p>源点到左部、右部到汇点的容量都是
+<code>1</code>，所以任何点都无法参与两对匹配。容量为整数，增广量也为整数，选中配对的净流量只能为
+<code>0</code> 或
+<code>1</code>。反过来，一组合法匹配可以沿对应的源汇路径各送一单位流量，两种方案一一对应。</p>
+<p>到这里还不能急着跑满。题目究竟要最多的配对，还是最高的总收益，会影响停止条件。</p>
+<p>考虑三条允许的配对，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_1</annotation></semantics></math>
+的收益为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>，<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_2</annotation></semantics></math>
+和
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>2</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_2R_1</annotation></semantics></math>
+的收益各为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>4</mn><annotation encoding="application/x-tex">4</annotation></semantics></math>。</p>
+<figure>
+<img src="/images/network-flow/03-weighted.svg" srcset="/img/loading.gif" lazyload
+alt="收益优先与数量优先的不同匹配" />
+<figcaption aria-hidden="true">收益优先与数量优先的不同匹配</figcaption>
+</figure>
+<p>只选
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>L</mi><mn>1</mn></msub><msub><mi>R</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">L_1R_1</annotation></semantics></math>，总收益为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>。改成另外两对，匹配数增加到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>，收益却降到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>8</mn><annotation encoding="application/x-tex">8</annotation></semantics></math>。所有边权都是正数，仍然会出现这种差别。</p>
+<p>选中收益为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
+的边以后，下一次增广会经过它的反向边。新增两条配对，撤销旧的一条，原始路径费用为</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>−</mi><mn>4</mn><mo>+</mo><mn>10</mn><mo>−</mo><mn>4</mn><mo>=</mo><mn>2</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+-4+10-4=2.
+</annotation></semantics></math></p>
+<p>这次增广让匹配数增加一，同时让收益减少二。算到这里，两种目标就很清楚了。</p>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>处理方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>只要求总收益最大，允许少选</td>
+<td>只有 <code>path_cost &lt; 0</code> 才增广</td>
+</tr>
+<tr>
+<td>先匹配最多，再让总收益最大</td>
+<td>一直增广到没有路径</td>
+</tr>
+<tr>
+<td>恰好匹配
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+对，收益最大</td>
+<td>最多增广到
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>，最后检查是否达到</td>
+</tr>
+</tbody>
+</table>
+<p>最短增广路的边际费用不会下降，因此可选匹配模式在最短路径费用非负时可以停止。它会跳过费用为
+<code>0</code> 的增广，所以不保证总收益相同时匹配数最多。</p>
+<h2 id="完整匹配用法">完整匹配用法</h2>
+<p>把下面的代码接在费用流核心后即可运行。<code>MATCH_MODE</code> 的
+<code>1 / 2 / 3</code> 分别对应上表三种目标。</p>
+<p>前两种模式输入 <code>nL nR m</code>，模式 <code>3</code> 输入
+<code>nL nR m K</code>。接下来
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+行为 <code>u v weight</code>，左右两侧各自从 <code>1</code>
+开始编号。首行输出匹配数和总收益，后面输出配对；固定
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+不可行时输出 <code>-1</code>。</p>
+<p>恢复方案仍然检查最终残量。候选边初始容量为
+<code>1</code>，对应反边容量为 <code>1</code>
+时，说明这对匹配最终被选中。中途增广过的边可能被撤销，不能看到一次流过就把它永久记进答案。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> MATCH_MODE = <span class="hljs-number">1</span>;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Candidate</span> &#123;<br>    <span class="hljs-type">int</span> u, v, idx;  <span class="hljs-comment">// 两侧原始编号，以及对应正向边编号</span><br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-literal">false</span>);<br>    cin.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br>    <span class="hljs-type">int</span> nL, nR, m;<br>    <span class="hljs-keyword">if</span> (!(cin &gt;&gt; nL &gt;&gt; nR &gt;&gt; m)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    ll K = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (MATCH_MODE == <span class="hljs-number">3</span>) cin &gt;&gt; K;<br>    s = <span class="hljs-number">0</span>;<br>    t = nL + nR + <span class="hljs-number">1</span>;<br>    <span class="hljs-built_in">init_graph</span>(t + <span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> u = <span class="hljs-number">1</span>; u &lt;= nL; ++u) <span class="hljs-built_in">add</span>(s, u, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v = <span class="hljs-number">1</span>; v &lt;= nR; ++v) <span class="hljs-built_in">add</span>(nL + v, t, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br>    vector&lt;Candidate&gt; candidate;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; m; ++i) &#123;<br>        <span class="hljs-type">int</span> u, v;<br>        ll weight;<br>        cin &gt;&gt; u &gt;&gt; v &gt;&gt; weight;<br>        <span class="hljs-type">int</span> idx = <span class="hljs-built_in">add</span>(u, nL + v, <span class="hljs-number">1</span>, -weight);<br>        candidate.<span class="hljs-built_in">push_back</span>(&#123;u, v, idx&#125;);<br>    &#125;<br>    pair&lt;ll, ll&gt; result;<br>    <span class="hljs-keyword">if</span> (MATCH_MODE == <span class="hljs-number">1</span>) &#123;<br>        result = <span class="hljs-built_in">min_cost_flow</span>(LLONG_MAX, <span class="hljs-literal">true</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (MATCH_MODE == <span class="hljs-number">2</span>) &#123;<br>        result = <span class="hljs-built_in">min_cost_flow</span>();<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        result = <span class="hljs-built_in">min_cost_flow</span>(K);<br>    &#125;<br>    <span class="hljs-keyword">auto</span> [flow, cost] = result;<br>    <span class="hljs-keyword">if</span> (MATCH_MODE == <span class="hljs-number">3</span> &amp;&amp; flow != K) &#123;<br>        cout &lt;&lt; <span class="hljs-number">-1</span> &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    &#125;<br>    cout &lt;&lt; flow &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span> &lt;&lt; -cost &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>    <span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> &amp;ed : candidate) &#123;<br>        <span class="hljs-keyword">if</span> (e[ed.idx ^ <span class="hljs-number">1</span>].c == <span class="hljs-number">1</span>) &#123;<br>            cout &lt;&lt; ed.u &lt;&lt; <span class="hljs-string">&#x27; &#x27;</span> &lt;&lt; ed.v &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>两侧各有
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+个点，要求完美匹配时，选模式 <code>3</code> 并令
+<code>K=n</code>。如果输入的是需要支付的费用
+<code>price</code>，配对边直接使用 <code>price</code>，输出
+<code>cost</code>；再按题意选择数量优先或固定流量的调用方式。</p>
+<h2 id="复杂度和使用范围">复杂度和使用范围</h2>
+<p>设原边数为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>E</mi><annotation encoding="application/x-tex">E</annotation></semantics></math>、点数为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>V</mi><annotation encoding="application/x-tex">V</annotation></semantics></math>，成功增广
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+次。需要 SPFA 时，初始化最坏为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(VE)</annotation></semantics></math>；不需要时只用
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E)</annotation></semantics></math>。这份实现的优先队列允许重复入堆，每轮
+Dijkstra 为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mrow><mi mathvariant="normal">log</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mo>+</mo><mn>2</mn><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E\log(E+2))</annotation></semantics></math>，一共至多
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">A+1</annotation></semantics></math>
+轮搜索，空间为
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E)</annotation></semantics></math>。二分图匹配每次增加一对，因此
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>≤</mo><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>n</mi><mi>L</mi></msub><mo>,</mo><msub><mi>n</mi><mi>R</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">A\le\min(n_L,n_R)</annotation></semantics></math>。</p>
+<p>模板要求容量为非负整数、源汇不同，并且初始残量网络没有负费用环。有负费用环的题目可能仍然有有限最优解，只是需要额外处理，本模板没有消环步骤。</p>
+<p>容量和费用都用了 <code>long long</code>，还要保证
+<code>pushed * path_cost</code>
+等中间运算不溢出，有限距离及势能的绝对值小于 <code>INF</code>。多测先
+<code>init_graph()</code>；同一张图比较不同目标时，重新建图或恢复初始
+<code>e</code>。直接再次调用会沿用已经修改的残量容量，返回的也只是这一次增加的量。</p>
+<p>参考 <a
+target="_blank" rel="noopener" href="https://courses.csail.mit.edu/6.854/20/Notes/n09-mincostflow.html">MIT
+6.854 的费用流讲义</a>，其中给出了最短费用增广和势能的正确性说明。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Competitive-Coding/" class="category-chain-item">Competitive Coding</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Graph-Theory/" class="print-no-link">#Graph Theory</a>
+      
+        <a href="/tags/Network-Flow/" class="print-no-link">#Network Flow</a>
+      
+        <a href="/tags/Bipartite-Matching/" class="print-no-link">#Bipartite Matching</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>费用流 &amp; 二分图带权匹配</div>
+      <div>https://m1ku319.github.io/min-cost-flow-weighted-matching/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>M1KU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>July 17, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/flow-matching-duality/" title="最大流最小割、König 与 Dilworth 背后的对偶">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">最大流最小割、König 与 Dilworth 背后的对偶</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/dinic-bipartite-matching/" title="Dinic &amp; 二分图最大匹配">
+                        <span class="hidden-mobile">Dinic &amp; 二分图最大匹配</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liQ7e35dsru6W7gx","clientSecret":"580874ca2a35fa61bd6f1a399c8b476b9c7e5e18","repo":"blog-comment","owner":"M1KU319","admin":["M1KU319"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'f4bd213d5e46ddf7ce2efbea6ce2994d'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
