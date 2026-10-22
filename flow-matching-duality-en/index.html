@@ -1,0 +1,1170 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/favicon.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="M1KU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Read the original Chinese version When I was learning the max-flow min-cut theorem, I kept feeling that it was a bit like König’s theorem and Dilworth’s theorem. One is about flow, one is about matchi">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Duality Behind Max-Flow Min-Cut, König and Dilworth">
+<meta property="og:url" content="https://m1ku319.github.io/flow-matching-duality-en/index.html">
+<meta property="og:site_name" content="M1KU&#39;s Blog">
+<meta property="og:description" content="Read the original Chinese version When I was learning the max-flow min-cut theorem, I kept feeling that it was a bit like König’s theorem and Dilworth’s theorem. One is about flow, one is about matchi">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-08-21T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T20:00:38.444Z">
+<meta property="article:author" content="M1KU">
+<meta property="article:tag" content="Bipartite Matching">
+<meta property="article:tag" content="Combinatorial Optimization">
+<meta property="article:tag" content="Graph Theory">
+<meta property="article:tag" content="Network Flow">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>The Duality Behind Max-Flow Min-Cut, König and Dilworth - M1KU&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"m1ku319.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>M1KU</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="The Duality Behind Max-Flow Min-Cut, König and Dilworth"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-22 00:00" pubdate>
+          August 22, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          661 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">The Duality Behind Max-Flow Min-Cut, König and Dilworth</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><a href="/flow-matching-duality/">Read the original Chinese
+version</a></p>
+<p>When I was learning the max-flow min-cut theorem, I kept feeling that
+it was a bit like König’s theorem and Dilworth’s theorem. One is about
+flow, one is about matching, and the other is about partially ordered
+sets. Yet they all end up with “a maximum equals a minimum”.</p>
+<p>They are all <strong>min-max theorems</strong> in combinatorial
+optimisation, which makes the connection easier to understand.</p>
+<span id="more"></span>
+<table>
+
+<thead>
+<tr>
+<th>Theorem</th>
+<th>What do we maximise?</th>
+<th>What do we minimise?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Max-flow min-cut</td>
+<td>Flow from the source to the sink</td>
+<td>Capacity of a cut separating the source and sink</td>
+</tr>
+<tr>
+<td>König, for bipartite graphs</td>
+<td>Number of edges in a matching</td>
+<td>Number of vertices in a vertex cover</td>
+</tr>
+<tr>
+<td>Dilworth, for finite partially ordered sets</td>
+<td>Number of elements in an antichain</td>
+<td>Number of chains needed to partition all elements</td>
+</tr>
+</tbody>
+</table>
+<h2 id="start-with-the-easier-side-to-prove">Start with the easier side
+to prove</h2>
+<p>The value of any flow cannot exceed the capacity of any cut. Once we
+separate the source and sink, the flow has to cross the cut, and the
+capacity of the cut limits how much can get through.</p>
+<p>Matching and vertex cover have a similar relationship. A vertex cover
+requires at least one endpoint of every edge to be selected. The edges
+in a matching share no endpoints, so covering these edges requires us to
+select at least one vertex for each of them. Therefore, for any matching
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>M</mi><annotation encoding="application/x-tex">M</annotation></semantics></math>
+and any vertex cover
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>,
+we have</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>M</mi><mo stretchy="false" form="prefix">|</mo><mo>≤</mo><mo stretchy="false" form="prefix">|</mo><mi>C</mi><mo stretchy="false" form="prefix">|</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|M|\le |C|.
+</annotation></semantics></math></p>
+<p>In a partially ordered set, every pair of elements in a
+<strong>chain</strong> is comparable, while every pair of distinct
+elements in an <strong>antichain</strong> is incomparable. A chain can
+contain at most one element of an antichain. If we have partitioned all
+elements into
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+chains, any antichain has size at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>.</p>
+<p>These inequalities all serve the same purpose. Finding a matching of
+size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>
+only tells us that the answer is at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>.
+If we also find a vertex cover of size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>,
+we immediately know the answer.</p>
+<p>This is the most intuitive use of duality. <strong>One side gives us
+a feasible solution, and the other proves that it cannot be improved any
+further.</strong> The difficult part is whether we can always find
+solutions with the same value on both sides.</p>
+<h2
+id="once-max-flow-finishes-the-min-cut-is-already-in-the-residual-graph">Once
+max flow finishes, the min cut is already in the residual graph</h2>
+<p>We will use the notation from <a
+href="/network-flow-basics-max-flow-en/">Network Flow Basics</a>. When
+there is no augmenting path, start a search from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>,
+following only edges with positive residual capacity. Call the set of
+reachable vertices
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>,
+and put the remaining vertices in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.</p>
+<p>At this point,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>∈</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">t\in T</annotation></semantics></math>.
+Every edge from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+in the original graph must be full; otherwise, we could still cross it.
+Every edge from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+in the original graph must carry no flow; otherwise, its reverse edge in
+the residual graph would also let us move from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.</p>
+<p>Adding up the flow conservation equations for the vertices in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>,
+the internal edges cancel out, leaving</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">|</mo><mo>=</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>S</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|f|=f(S,T)-f(T,S)=c(S,T).
+</annotation></semantics></math></p>
+<p>We have found a flow and a cut with the same value. Since any flow is
+bounded by any cut, both must be optimal.</p>
+<p>There is no requirement here for capacities to be integers. Integer
+capacities give us a separate property: <strong>an integer maximum flow
+exists</strong>. We will need this when interpreting flow as a
+matching.</p>
+<h2 id="königs-theorem-follows-directly-from-min-cut">König’s theorem
+follows directly from min cut</h2>
+<p>Let the two sides of a bipartite graph be
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>,</mo><mi>R</mi></mrow><annotation encoding="application/x-tex">L,R</annotation></semantics></math>.
+Build the following network.</p>
+<table>
+<thead>
+<tr>
+<th>Edge</th>
+<th>Capacity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>u</mi></mrow><annotation encoding="application/x-tex">s\to u</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>∈</mo><mi>L</mi></mrow><annotation encoding="application/x-tex">u\in L</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math></td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>→</mo><mi>v</mi></mrow><annotation encoding="application/x-tex">u\to v</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(u,v)</annotation></semantics></math>
+is an edge in the original graph</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>N</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">INF</annotation></semantics></math></td>
+</tr>
+<tr>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">v\to t</annotation></semantics></math>,
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>∈</mo><mi>R</mi></mrow><annotation encoding="application/x-tex">v\in R</annotation></semantics></math></td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+<p>Compared with the construction in <a
+href="/dinic-bipartite-matching-en/">Bipartite Matching</a>, the
+capacities of the middle edges have changed to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>N</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">INF</annotation></semantics></math>.
+The edges at both ends still limit each vertex to at most one unit of
+flow, so an integer maximum flow still corresponds to a maximum
+matching.</p>
+<p>Taking
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>N</mi><mi>F</mi><mo>=</mo><mo stretchy="false" form="prefix">|</mo><mi>L</mi><mo stretchy="false" form="prefix">|</mo><mi>+</mi><mo stretchy="false" form="prefix">|</mo><mi>R</mi><mo stretchy="false" form="prefix">|</mo><mi>+</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">INF=|L|+|R|+1</annotation></semantics></math>
+is enough. Cutting only the outgoing edges of the source already costs
+at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>L</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|L|</annotation></semantics></math>,
+so a minimum cut will never choose to cut a middle edge with capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>N</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">INF</annotation></semantics></math>.</p>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+be the source side of a minimum cut, and choose</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>L</mi><mo>\</mo><mi>S</mi><mo stretchy="false" form="postfix">)</mo><mo>∪</mo><mo stretchy="false" form="prefix">(</mo><mi>R</mi><mo>∩</mo><mi>S</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+C=(L\setminus S)\cup(R\cap S).
+</annotation></semantics></math></p>
+<p>In other words, choose the unreachable vertices on the left and the
+reachable vertices on the right.</p>
+<p>If neither endpoint of an original edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(u,v)</annotation></semantics></math>
+were selected, then
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>∈</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">u\in S</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>∉</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">v\notin S</annotation></semantics></math>.
+This edge would cross the cut and contribute
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>I</mi><mi>N</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">INF</annotation></semantics></math>,
+contradicting what we just showed. Therefore,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+covers every edge.</p>
+<p>The unit-capacity edges crossing the cut correspond exactly to the
+selected vertices, so</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>C</mi><mo stretchy="false" form="prefix">|</mo><mo>=</mo><mtext mathvariant="normal">min cut</mtext><mo>=</mo><mtext mathvariant="normal">max flow</mtext><mo>=</mo><mo stretchy="false" form="prefix">|</mo><mi>M</mi><mo stretchy="false" form="prefix">|</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|C|=\text{min cut}=\text{max flow}=|M|.
+</annotation></semantics></math></p>
+<p>Every vertex cover also has at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>M</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|M|</annotation></semantics></math>
+vertices, which proves König’s theorem. Conversely, given a vertex cover
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>,
+we can take
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>s</mi><mo stretchy="false" form="postfix">}</mo><mo>∪</mo><mo stretchy="false" form="prefix">(</mo><mi>L</mi><mo>\</mo><mi>C</mi><mo stretchy="false" form="postfix">)</mo><mo>∪</mo><mo stretchy="false" form="prefix">(</mo><mi>R</mi><mo>∩</mo><mi>C</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">S=\{s\}\cup(L\setminus C)\cup(R\cap C)</annotation></semantics></math>
+to construct a cut of capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>C</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|C|</annotation></semantics></math>.</p>
+<p>Using the same <code>e + id</code> adjacency list as before, we can
+recover this vertex cover directly <strong>after running max flow on the
+network above</strong>. The left vertices are numbered
+<code>1..nL</code>, and the right vertices are numbered
+<code>nL+1..nL+nR</code>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">vector&lt;<span class="hljs-type">int</span>&gt; <span class="hljs-title">vis</span><span class="hljs-params">(id.size(), <span class="hljs-number">0</span>)</span></span>;<br>queue&lt;<span class="hljs-type">int</span>&gt; q;<br>q.<span class="hljs-built_in">push</span>(s);<br>vis[s] = <span class="hljs-number">1</span>;<br><span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>    <span class="hljs-type">int</span> u = q.<span class="hljs-built_in">front</span>();<br>    q.<span class="hljs-built_in">pop</span>();<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> idx : id[u])&#123;<br>        <span class="hljs-type">int</span> v = e[idx].v;<br>        <span class="hljs-keyword">if</span>(e[idx].c &gt; <span class="hljs-number">0</span> &amp;&amp; !vis[v])&#123;<br>            vis[v] = <span class="hljs-number">1</span>;<br>            q.<span class="hljs-built_in">push</span>(v);<br>        &#125;<br>    &#125;<br>&#125;<br>vector&lt;<span class="hljs-type">int</span>&gt; coverL, coverR;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> u = <span class="hljs-number">1</span>; u &lt;= nL; ++u)<br>    <span class="hljs-keyword">if</span>(!vis[u]) coverL.<span class="hljs-built_in">push_back</span>(u);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v = <span class="hljs-number">1</span>; v &lt;= nR; ++v)<br>    <span class="hljs-keyword">if</span>(vis[nL + v]) coverR.<span class="hljs-built_in">push_back</span>(v);<br></code></pre></td></tr></table></figure>
+<h2 id="dilworth-connects-to-bipartite-matching-too">Dilworth connects
+to bipartite matching too</h2>
+<p>Suppose a finite partially ordered set has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+elements. Make a left and a right copy of each element
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
+called
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>,</mo><msub><mi>x</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">x_L,x_R</annotation></semantics></math>.
+Add an edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>→</mo><msub><mi>y</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">x_L\to y_R</annotation></semantics></math>
+if and only if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>&lt;</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">x&lt;y</annotation></semantics></math>.
+We use the strict relation here, so there is no edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>→</mo><msub><mi>x</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">x_L\to x_R</annotation></semantics></math>.</p>
+<p>A matching edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>→</mo><msub><mi>y</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">x_L\to y_R</annotation></semantics></math>
+means placing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>y</mi><annotation encoding="application/x-tex">y</annotation></semantics></math>
+directly after
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>.
+The matching ensures that each element has at most one predecessor and
+one successor, while the strict partial order prevents cycles.
+Therefore, a matching of size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+connects the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+elements into
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">n-m</annotation></semantics></math>
+chains.</p>
+<p>Conversely, if we have a partition into
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+chains, connecting consecutive elements in each chain gives us
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>k</mi></mrow><annotation encoding="application/x-tex">n-k</annotation></semantics></math>
+matching edges. So, if the maximum matching has size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>,
+then</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">minimum chain partition size</mtext><mo>=</mo><mi>n</mi><mo>−</mo><mi>m</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\text{minimum chain partition size}=n-m.
+</annotation></semantics></math></p>
+<p>We still need an antichain of the same size.</p>
+<p>By König’s theorem, the bipartite graph of copies has a vertex cover
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+of size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>.
+Keep the original elements whose left and right copies are both outside
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>,
+giving the set</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>x</mi><mo>∣</mo><msub><mi>x</mi><mi>L</mi></msub><mo>∉</mo><mi>C</mi><mo>,</mo><mspace width="0.222em"></mspace><msub><mi>x</mi><mi>R</mi></msub><mo>∉</mo><mi>C</mi><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+A=\{x\mid x_L\notin C,\ x_R\notin C\}.
+</annotation></semantics></math></p>
+<p>If there were elements
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>&lt;</mo><mi>y</mi></mrow><annotation encoding="application/x-tex">x&lt;y</annotation></semantics></math>
+in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>,
+neither endpoint of the edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>L</mi></msub><mo>→</mo><msub><mi>y</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">x_L\to y_R</annotation></semantics></math>
+would be covered. Therefore,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>A</mi><annotation encoding="application/x-tex">A</annotation></semantics></math>
+must be an antichain.</p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+contains only
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+copies, so it excludes at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+original elements. This gives
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>A</mi><mo stretchy="false" form="prefix">|</mo><mo>≥</mo><mi>n</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">|A|\ge n-m</annotation></semantics></math>.
+We have also already constructed
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">n-m</annotation></semantics></math>
+chains, and each chain can contain at most one antichain element, so
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>A</mi><mo stretchy="false" form="prefix">|</mo><mo>≤</mo><mi>n</mi><mo>−</mo><mi>m</mi></mrow><annotation encoding="application/x-tex">|A|\le n-m</annotation></semantics></math>.
+Putting the two sides together gives</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><menclose notation="box"><mtable><mtr><mtd columnalign="center" style="text-align: center"><mtext mathvariant="normal">maximum antichain size</mtext></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mo>=</mo><mtext mathvariant="normal">minimum chain partition size</mtext></mtd></mtr><mtr><mtd columnalign="center" style="text-align: center"><mo>=</mo><mi>n</mi><mo>−</mo><mi>m</mi></mtd></mtr></mtable></menclose><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\boxed{\begin{gathered}
+\text{maximum antichain size}\\
+=\text{minimum chain partition size}\\
+=n-m
+\end{gathered}}.
+</annotation></semantics></math></p>
+<p>For example, suppose
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&lt;</mo><mi>b</mi><mo>&lt;</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">a&lt;b&lt;d</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>&lt;</mo><mi>c</mi><mo>&lt;</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">a&lt;c&lt;d</annotation></semantics></math>,
+while
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>,</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">b,c</annotation></semantics></math>
+are incomparable. The matching
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>L</mi></msub><msub><mi>b</mi><mi>R</mi></msub><mo>,</mo><msub><mi>b</mi><mi>L</mi></msub><msub><mi>d</mi><mi>R</mi></msub></mrow><annotation encoding="application/x-tex">a_Lb_R,b_Ld_R</annotation></semantics></math>
+gives two chains,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a,b,d)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>c</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(c)</annotation></semantics></math>.
+The vertex cover
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>a</mi><mi>L</mi></msub><mo>,</mo><msub><mi>d</mi><mi>R</mi></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{a_L,d_R\}</annotation></semantics></math>
+leaves the antichain
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{b,c\}</annotation></semantics></math>.
+Both the number of chains and the antichain size are
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>.</p>
+<p><strong>This construction needs all comparable pairs.</strong> If the
+partial order comes from reachability in a DAG, we need to consider the
+transitive closure. For example, suppose the original graph only has</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>c</mi><mo>,</mo><mspace width="1.0em"></mspace><mi>b</mi><mo>→</mo><mi>c</mi><mo>,</mo><mspace width="1.0em"></mspace><mi>c</mi><mo>→</mo><mi>d</mi><mo>,</mo><mspace width="1.0em"></mspace><mi>c</mi><mo>→</mo><mi>e</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
+a\to c,\quad b\to c,\quad c\to d,\quad c\to e.
+</annotation></semantics></math></p>
+<p>If we build the bipartite graph using only these original edges, the
+maximum matching has size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>,
+giving a minimum vertex-disjoint path cover of size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>−</mo><mn>2</mn><mo>=</mo><mn>3</mn></mrow><annotation encoding="application/x-tex">5-2=3</annotation></semantics></math>.
+If we use reachability instead, we can also use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>&lt;</mo><mi>d</mi></mrow><annotation encoding="application/x-tex">b&lt;d</annotation></semantics></math>
+and partition the elements into two chains,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>,</mo><mi>c</mi><mo>,</mo><mi>e</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(a,c,e)</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>b</mi><mo>,</mo><mi>d</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(b,d)</annotation></semantics></math>.
+Chains can skip intermediate elements, while vertex-disjoint paths must
+actually pass through them along the original edges. These two
+constructions answer different questions.</p>
+<h2 id="linear-programming-writes-this-connection-as-formulas">Linear
+programming writes this connection as formulas</h2>
+<p>First, write matching as an optimisation problem. Give each edge a
+variable
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>x</mi><mi>e</mi></msub><annotation encoding="application/x-tex">x_e</annotation></semantics></math>,
+which is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+if we select the edge and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+otherwise. Each vertex can belong to at most one matching edge, so we
+have</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><munder><mo>∑</mo><mrow><mi>e</mi><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>x</mi><mi>e</mi></msub><mo>,</mo><mspace width="2.0em"></mspace><munder><mo>∑</mo><mrow><mi>e</mi><mo>∋</mo><mi>v</mi></mrow></munder><msub><mi>x</mi><mi>e</mi></msub><mo>≤</mo><mn>1</mn><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mo>∀</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>x</mi><mi>e</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\max\sum_{e\in E}x_e,
+\qquad
+\sum_{e\ni v}x_e\le 1\quad(\forall v),
+\qquad x_e\in\{0,1\}.
+</annotation></semantics></math></p>
+<p>Relaxing the last condition to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>e</mi></msub><mo>≥</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">x_e\ge 0</annotation></semantics></math>
+gives a linear programming relaxation. The constraints at the endpoints
+of each edge already ensure
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mi>e</mi></msub><mo>≤</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x_e\le1</annotation></semantics></math>.
+Its dual is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">min</mi><mo>&#8289;</mo></mrow><munder><mo>∑</mo><mrow><mi>v</mi><mo>∈</mo><mi>V</mi></mrow></munder><msub><mi>y</mi><mi>v</mi></msub><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>y</mi><mi>u</mi></msub><mo>+</mo><msub><mi>y</mi><mi>v</mi></msub><mo>≥</mo><mn>1</mn><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mo>∀</mo><mi>u</mi><mi>v</mi><mo>∈</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="2.0em"></mspace><msub><mi>y</mi><mi>v</mi></msub><mo>≥</mo><mn>0</mn><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\min\sum_{v\in V}y_v,
+\qquad
+y_u+y_v\ge 1\quad(\forall uv\in E),
+\qquad y_v\ge 0.
+</annotation></semantics></math></p>
+<p>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>v</mi></msub><annotation encoding="application/x-tex">y_v</annotation></semantics></math>
+is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+it tells us exactly whether vertex
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+is selected. The constraints require at least one endpoint of every edge
+to be selected. This is vertex cover.</p>
+<p>We can also calculate directly why the two expressions bound each
+other.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mrow><mi>u</mi><mi>v</mi><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>x</mi><mrow><mi>u</mi><mi>v</mi></mrow></msub><mo>≤</mo><munder><mo>∑</mo><mrow><mi>u</mi><mi>v</mi><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>x</mi><mrow><mi>u</mi><mi>v</mi></mrow></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>y</mi><mi>u</mi></msub><mo>+</mo><msub><mi>y</mi><mi>v</mi></msub><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>v</mi><mo>∈</mo><mi>V</mi></mrow></munder><msub><mi>y</mi><mi>v</mi></msub><munder><mo>∑</mo><mrow><mi>e</mi><mo>∋</mo><mi>v</mi></mrow></munder><msub><mi>x</mi><mi>e</mi></msub><mo>≤</mo><munder><mo>∑</mo><mrow><mi>v</mi><mo>∈</mo><mi>V</mi></mrow></munder><msub><mi>y</mi><mi>v</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\sum_{uv\in E}x_{uv}
+\le\sum_{uv\in E}x_{uv}(y_u+y_v)
+=\sum_{v\in V}y_v\sum_{e\ni v}x_e
+\le\sum_{v\in V}y_v.
+</annotation></semantics></math></p>
+<p>This is called <strong>weak duality</strong>. <strong>Strong
+duality</strong> goes further and guarantees that the optimal values of
+these two linear programs are equal.</p>
+<p>But they now allow fractions. To get back to actual matchings and
+vertex covers, we still need to show that allowing fractions does not
+change the optimal values. Bipartite graphs have exactly this
+integrality property, which follows from the <strong>total
+unimodularity</strong> of their vertex-edge incidence matrices. This
+property requires every square submatrix to have a determinant in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><mi>−</mi><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{-1,0,1\}</annotation></semantics></math>.
+Together with the integer right-hand sides here, it means both problems
+have integer optimal solutions. The integer variables for vertex cover
+can also be capped so that they only take values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.</p>
+<p>This does not necessarily hold for general graphs. Try a
+triangle.</p>
+<table>
+
+<thead>
+<tr>
+<th>Problem</th>
+<th>Select it or leave it out</th>
+<th>Fractions allowed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Maximum matching</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math></td>
+<td>Assign
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">1/2</annotation></semantics></math>
+to every edge; the optimum is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">3/2</annotation></semantics></math></td>
+</tr>
+<tr>
+<td>Minimum vertex cover</td>
+<td><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math></td>
+<td>Assign
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">1/2</annotation></semantics></math>
+to every vertex; the optimum is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">3/2</annotation></semantics></math></td>
+</tr>
+</tbody>
+</table>
+<p>The two linear programs still satisfy strong duality, but the actual
+matching and vertex cover have different values. This is where the
+“bipartite graph” condition in König’s theorem matters.</p>
+<p>Max-flow min-cut can also be proved through linear programming
+duality. Strictly speaking, the dual we first write down contains
+real-valued vertex potential variables. We still need to prove that we
+can extract a cut with the same value from an optimal dual solution.
+Only then have we connected the optimal value in the linear program to a
+cut we can actually find in the graph.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://ocw.mit.edu/courses/18-200-principles-of-discrete-applied-mathematics-spring-2024/mit18_200_s24_lec11-12.pdf">MIT
+lecture notes on network flow and matching</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://math.mit.edu/~goemans/18433S13/matching-notes.pdf">MIT
+lecture notes on bipartite matching</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.princeton.edu/~aaa/Public/Teaching/ORF523/ORF523_Lec6.pdf">Princeton
+lecture notes on duality and total unimodularity</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.math.uni-hamburg.de/home/janko/Lecture1">Hamburg
+lecture notes on discrete mathematics, page 40</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://www.contrib.andrew.cmu.edu/~ravi/book.pdf">Iterative
+Methods in Combinatorial Optimization, Chapter 3</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Competitive-Coding/" class="category-chain-item">Competitive Coding</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Graph-Theory/" class="print-no-link">#Graph Theory</a>
+      
+        <a href="/tags/Network-Flow/" class="print-no-link">#Network Flow</a>
+      
+        <a href="/tags/Bipartite-Matching/" class="print-no-link">#Bipartite Matching</a>
+      
+        <a href="/tags/Combinatorial-Optimization/" class="print-no-link">#Combinatorial Optimization</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>The Duality Behind Max-Flow Min-Cut, König and Dilworth</div>
+      <div>https://m1ku319.github.io/flow-matching-duality-en/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>M1KU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>August 22, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/flow-matching-duality/" title="最大流最小割、König 与 Dilworth 背后的对偶">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">最大流最小割、König 与 Dilworth 背后的对偶</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/min-cost-flow-weighted-matching/" title="费用流 &amp; 二分图带权匹配">
+                        <span class="hidden-mobile">费用流 &amp; 二分图带权匹配</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liQ7e35dsru6W7gx","clientSecret":"580874ca2a35fa61bd6f1a399c8b476b9c7e5e18","repo":"blog-comment","owner":"M1KU319","admin":["M1KU319"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: 'df584e25bd977b7d9dc82f5f104ccc4c'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

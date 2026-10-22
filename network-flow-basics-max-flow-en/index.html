@@ -1,0 +1,1124 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/favicon.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="M1KU">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Read the original Chinese version We can start by thinking of network flow as moving goods through a directed graph. The goods travel from a starting point to a destination along different routes, and">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Network Flow Basics &amp; Maximum Flow">
+<meta property="og:url" content="https://m1ku319.github.io/network-flow-basics-max-flow-en/index.html">
+<meta property="og:site_name" content="M1KU&#39;s Blog">
+<meta property="og:description" content="Read the original Chinese version We can start by thinking of network flow as moving goods through a directed graph. The goods travel from a starting point to a destination along different routes, and">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://m1ku319.github.io/images/network-flow/01-residual-en.svg">
+<meta property="article:published_time" content="2026-06-09T23:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-22T19:58:58.917Z">
+<meta property="article:author" content="M1KU">
+<meta property="article:tag" content="Graph Theory">
+<meta property="article:tag" content="Network Flow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://m1ku319.github.io/images/network-flow/01-residual-en.svg">
+  
+  
+  
+  <title>Network Flow Basics &amp; Maximum Flow - M1KU&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"m1ku319.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":50,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>M1KU</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/2.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Network Flow Basics &amp; Maximum Flow"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-10 00:00" pubdate>
+          June 10, 2026 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          808 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Network Flow Basics &amp; Maximum Flow</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p><a href="/network-flow-basics-max-flow/">Read the original Chinese
+version</a></p>
+<p>We can start by thinking of network flow as moving goods through a
+directed graph. The goods travel from a starting point to a destination
+along different routes, and each road has a limit on how much it can
+carry. Maximum flow asks how much we can send in total. If each road
+also charges a fee, we get to min-cost flow.</p>
+<span id="more"></span>
+<h2 id="the-basic-ideas-of-network-flow">The basic ideas of network
+flow</h2>
+<p>Given a directed graph, choose a source
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+and a sink
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
+Each edge has a capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">c(u,v)</annotation></semantics></math>,
+which is the most flow it can carry. We want to send as much flow as
+possible from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</p>
+<p>The source is where flow starts, the sink is where it ends, and the
+other vertices pass it along. For example, suppose the only path is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>a</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s\to a\to t</annotation></semantics></math>,
+with capacities
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>.
+We can send at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+units. A capacity of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+does not mean we have to send
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+units; it is just the upper limit for that edge.</p>
+<p>Write the actual flow through an edge as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">f(u,v)</annotation></semantics></math>.
+It must satisfy</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mo>≤</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+0\le f(u,v)\le c(u,v).
+</annotation></semantics></math></p>
+<p>Intermediate vertices must also satisfy flow conservation. At every
+vertex except the source and sink, the total incoming flow equals the
+total outgoing flow. Flow cannot appear out of nowhere, and we cannot
+leave some of it at an intermediate vertex.</p>
+<p>If we write an original edge as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
+and its flow as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>e</mi></msub><annotation encoding="application/x-tex">f_e</annotation></semantics></math>,
+then every intermediate vertex
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+satisfies</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mrow><mi>e</mi><mo>:</mo><mspace width="0.167em"></mspace><mi>e</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> enters </mtext><mspace width="0.333em"></mspace></mrow><mi>v</mi></mrow></munder><msub><mi>f</mi><mi>e</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>e</mi><mo>:</mo><mspace width="0.167em"></mspace><mi>e</mi><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> leaves </mtext><mspace width="0.333em"></mspace></mrow><mi>v</mi></mrow></munder><msub><mi>f</mi><mi>e</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\sum_{e:\,e\text{ enters }v}f_e
+=\sum_{e:\,e\text{ leaves }v}f_e.
+</annotation></semantics></math></p>
+<p>The total flow is the net flow leaving the source, which also equals
+the net flow entering the sink. We can use several paths at once. If
+several paths share an edge, their combined flow through that edge must
+still stay within its capacity.</p>
+<p>A flow assignment that satisfies the capacity constraints and flow
+conservation is called a <strong>feasible flow</strong>. Its value is
+usually written as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|f|</annotation></semantics></math>.
+We only count the net flow leaving the source, rather than adding up the
+flow on every edge. The same goods do not become several batches just
+because they pass through several roads. A <strong>maximum flow</strong>
+is a feasible flow with the largest possible
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">|</mo></mrow><annotation encoding="application/x-tex">|f|</annotation></semantics></math>.</p>
+<h3 id="adding-a-cost-to-each-edge">Adding a cost to each edge</h3>
+<p>If different routes have different costs, give each original edge
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
+a cost per unit
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>w</mi><mi>e</mi></msub><annotation encoding="application/x-tex">w_e</annotation></semantics></math>.
+Sending
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>e</mi></msub><annotation encoding="application/x-tex">f_e</annotation></semantics></math>
+units through it costs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>e</mi></msub><msub><mi>w</mi><mi>e</mi></msub></mrow><annotation encoding="application/x-tex">f_e w_e</annotation></semantics></math>,
+so the total cost is</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi mathvariant="normal">cost</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mi>f</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>e</mi><mo>∈</mo><mi>E</mi></mrow></munder><msub><mi>f</mi><mi>e</mi></msub><msub><mi>w</mi><mi>e</mi></msub><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\operatorname{cost}(f)=\sum_{e\in E}f_e w_e.
+</annotation></semantics></math></p>
+<p>For example, suppose the two edges on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>a</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s\to a\to t</annotation></semantics></math>
+cost
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+per unit. Sending one unit costs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>5</mn><annotation encoding="application/x-tex">5</annotation></semantics></math>,
+and sending two costs
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>.
+Capacity limits how much we can send, while cost affects which route we
+choose.</p>
+<p>There are two common goals to distinguish here. <strong>Min-cost flow
+with a fixed value</strong> asks us to send exactly
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>
+units and find the cheapest way to do so. If the maximum flow is less
+than
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>K</mi><annotation encoding="application/x-tex">K</annotation></semantics></math>,
+there is no solution. <strong>Min-cost maximum flow</strong> first
+maximises the flow, then minimises the cost among all maximum flows. We
+cannot send less just to make it cheaper.</p>
+<p>This post starts with maximum flow, using augmenting paths and
+reverse edges. Next, <a href="/dinic-bipartite-matching-en/">Dinic &amp;
+Maximum Bipartite Matching</a> speeds up augmentation and applies it to
+pairing problems. Then <a
+href="/min-cost-flow-weighted-matching-en/">Min-Cost Flow &amp; Weighted
+Bipartite Matching</a> adds costs. The final post, <a
+href="/flow-matching-duality-en/">The Duality Behind Max-Flow Min-Cut,
+König and Dilworth</a>, connects the reasons why these solutions are
+optimal.</p>
+<h2 id="starting-with-one-path">Starting with one path</h2>
+<p>First, find a path from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
+If the remaining capacities along it are
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>7</mn></mrow><annotation encoding="application/x-tex">5,3,7</annotation></semantics></math>,
+we can send at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>3</mn><annotation encoding="application/x-tex">3</annotation></semantics></math>
+units this time. The smallest remaining capacity limits the whole path.
+This is usually called the bottleneck capacity.</p>
+<p>After sending that flow, we look for another path. This is where
+things get interesting.</p>
+<h2 id="reverse-edges-let-us-change-earlier-choices">Reverse edges let
+us change earlier choices</h2>
+<p>Consider four vertices
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s,a,b,t</annotation></semantics></math>.
+The original graph has five edges:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>a</mi></mrow><annotation encoding="application/x-tex">s\to a</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">s\to b</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\to b</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">a\to t</annotation></semantics></math>,
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">b\to t</annotation></semantics></math>.
+Every edge has capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.</p>
+<p>Suppose we first choose
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>a</mi><mo>→</mo><mi>b</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s\to a\to b\to t</annotation></semantics></math>.
+All three edges become full. If we only look at the remaining capacities
+of the original edges,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+can still reach
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>,
+but
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>
+can no longer reach
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.
+It looks as if we can only send
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit.</p>
+<p>But choosing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>a</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s\to a\to t</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>b</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">s\to b\to t</annotation></semantics></math>
+clearly gives us
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>.
+We need a way to adjust our first choice.</p>
+<figure>
+<img src="/images/network-flow/01-residual-en.svg" srcset="/img/loading.gif" lazyload
+alt="Two augmentations and reverse edges" />
+<figcaption aria-hidden="true">Two augmentations and reverse
+edges</figcaption>
+</figure>
+<p>Once
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit has flowed through
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\to b</annotation></semantics></math>,
+we also allow
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit to travel along
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>→</mo><mi>a</mi></mrow><annotation encoding="application/x-tex">b\to a</annotation></semantics></math>.
+Using this reverse edge removes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit of the earlier flow on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\to b</annotation></semantics></math>.</p>
+<p>We can now find another path:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>b</mi><mo>→</mo><mi>a</mi><mo>→</mo><mi>t</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">
+s\to b\to a\to t.
+</annotation></semantics></math></p>
+<p>We add
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit to both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">s\to b</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>t</mi></mrow><annotation encoding="application/x-tex">a\to t</annotation></semantics></math>,
+and remove
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>→</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\to b</annotation></semantics></math>.
+What remains is exactly the two paths carrying
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
+unit each, giving a total flow of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>.
+Flow conservation still holds at every intermediate vertex along the new
+path.</p>
+<p><strong>A reverse edge records how much of an earlier flow we can
+undo.</strong> An original edge with capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
+and current flow
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+has two residual edges: a forward edge with remaining capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo>−</mo><mi>f</mi></mrow><annotation encoding="application/x-tex">c-f</annotation></semantics></math>,
+and a reverse edge with remaining capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>.
+Keeping only edges with positive residual capacity gives us the residual
+network. An
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>-to-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+path in this network is called an augmenting path.</p>
+<p>The code only stores residual capacities. After sending
+<code>pushed</code> units, we update them with</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp">e[idx].c -= pushed;<br>e[idx ^ <span class="hljs-number">1</span>].c += pushed;<br></code></pre></td></tr></table></figure>
+<p>We use the same two lines when traversing a reverse edge. They reduce
+its residual capacity and restore capacity on the forward edge, which is
+exactly how we undo earlier flow.</p>
+<h2 id="ford-fulkerson">Ford-Fulkerson</h2>
+<p>Ford-Fulkerson is quite straightforward. Find an augmenting path in
+the residual network, send its bottleneck capacity along it, and keep
+looking until no such path remains.</p>
+<p>We can use DFS to find a path. In <code>dfs(u, lim)</code>,
+<code>lim</code> is the most flow the current path can still carry.
+Return it when we reach the sink. When moving to the next edge, pass
+<code>min(lim, e[idx].c)</code>, then use any positive flow returned to
+update the residual capacities.</p>
+<p>There is an easy mistake to make here. If one recursive call returns
+<code>0</code>, only that branch has failed; we should keep trying the
+other outgoing edges. Return early only after finding an augmenting
+path. If every branch fails, return <code>0</code> at the end of the
+function. Also, clear <code>vis</code> before every new search. A vertex
+visited last time may still be useful this time.</p>
+<p>Assume all capacities are integers and the maximum flow is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>.
+Every successful augmentation adds at least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
+so there are at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>F</mi><annotation encoding="application/x-tex">F</annotation></semantics></math>
+successful augmentations. Each search takes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E)</annotation></semantics></math>.
+Including the final failed search, the total upper bound is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mo stretchy="false" form="prefix">(</mo><mi>F</mi><mo>+</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O((F+1)(V+E))</annotation></semantics></math>,
+often written as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>E</mi><mi>F</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(EF)</annotation></semantics></math>.
+This bound depends on the numerical value of the flow, so it can be slow
+when capacities are large.</p>
+<p>With irrational capacities, Ford-Fulkerson may not even terminate if
+paths are chosen arbitrarily. Edmonds-Karp specifies how to choose
+paths, giving a complexity bound in terms of the numbers of vertices and
+edges.</p>
+<h2 id="edmonds-karp">Edmonds-Karp</h2>
+<p>Edmonds-Karp, or EK, uses BFS to find each augmenting path. Residual
+capacity only decides whether an edge can be used. <strong>BFS builds
+layers by the number of edges</strong>, so it finds a path with the
+fewest edges.</p>
+<p>For example, one path has two edges, each with remaining capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>.
+Another has three edges, each with remaining capacity
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>100</mn><annotation encoding="application/x-tex">100</annotation></semantics></math>.
+EK chooses the first one. Once the path is fixed, we take its smallest
+residual capacity to decide how much flow to send.</p>
+<p>BFS processes vertices in queue order. When a vertex is reached, all
+vertices reachable using fewer edges have already been discovered.
+Expanding from a vertex at distance
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>,
+any newly discovered vertex belongs to layer
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">d+1</annotation></semantics></math>.
+We are not sorting by capacity, and we do not need a priority queue.</p>
+<h3 id="recording-the-path-and-its-bottleneck">Recording the path and
+its bottleneck</h3>
+<p>Use <code>pre[v]</code> to store the index of the edge entering
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>.
+Initialise it to <code>-1</code>, which also marks the vertex as
+unvisited. Mark the source in advance, or a residual reverse edge might
+put it back in the queue.</p>
+<p>Why store an edge index? There may be parallel edges between the same
+two vertices, so the previous vertex alone cannot tell us which edge we
+used. Given an edge index <code>idx</code>, its starting vertex is
+<code>e[idx ^ 1].v</code>.</p>
+<p><code>flow[v]</code> stores the bottleneck of the
+source-to-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+path chosen by this BFS. When extending the path along an edge, update
+it with</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs cpp">flow[v] = <span class="hljs-built_in">min</span>(flow[u], e[idx].c);<br></code></pre></td></tr></table></figure>
+<p>Once we reach the sink, <code>flow[t]</code> is the amount we can
+send in this augmentation. Here, <code>flow[v]</code> only describes the
+current path. It does not represent the total flow through
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+in the final solution. We can also leave out this array and walk back
+along <code>pre</code> after reaching the sink to find the smallest
+capacity.</p>
+<h3 id="full-code">Full code</h3>
+<p>We keep using the <code>e + id</code> adjacency list. <code>e</code>
+stores all edges, and <code>id[u]</code> stores the indices of the edges
+leaving
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>u</mi><annotation encoding="application/x-tex">u</annotation></semantics></math>.
+Each call to add an edge inserts its forward and reverse edges
+consecutively, so <code>idx ^ 1</code> switches between them.</p>
+<p>The input starts with <code>n m s t</code>, followed by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>m</mi><annotation encoding="application/x-tex">m</annotation></semantics></math>
+lines of <code>u v c</code>. Vertices are numbered <code>[1,n]</code>.
+The source and sink must be different, capacities must be non-negative
+integers, and both the capacities and the answer must fit in
+<code>long long</code>.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;queue&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;algorithm&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;climits&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-keyword">using</span> ll = <span class="hljs-type">long</span> <span class="hljs-type">long</span>;<br><br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">Edge</span>&#123;<br>    <span class="hljs-type">int</span> v;<br>    ll c;<br>&#125;;<br><br>vector&lt;Edge&gt; e;<br>vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; id;<br>vector&lt;<span class="hljs-type">int</span>&gt; pre;<br>vector&lt;ll&gt; flow;<br><span class="hljs-type">int</span> n, m, s, t;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> u, <span class="hljs-type">int</span> v, ll c)</span></span>&#123;<br>    <span class="hljs-type">int</span> idx = (<span class="hljs-type">int</span>)e.<span class="hljs-built_in">size</span>();<br>    e.<span class="hljs-built_in">push_back</span>(&#123;v, c&#125;);<br>    e.<span class="hljs-built_in">push_back</span>(&#123;u, <span class="hljs-number">0</span>&#125;);<br>    id[u].<span class="hljs-built_in">push_back</span>(idx);<br>    id[v].<span class="hljs-built_in">push_back</span>(idx ^ <span class="hljs-number">1</span>);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">bfs</span><span class="hljs-params">()</span></span>&#123;<br>    pre.<span class="hljs-built_in">assign</span>(n + <span class="hljs-number">1</span>, <span class="hljs-number">-1</span>);<br>    flow.<span class="hljs-built_in">assign</span>(n + <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br>    queue&lt;<span class="hljs-type">int</span>&gt; q;<br>    pre[s] = <span class="hljs-number">-2</span>;<br>    flow[s] = LLONG_MAX;<br>    q.<span class="hljs-built_in">push</span>(s);<br><br>    <span class="hljs-keyword">while</span>(!q.<span class="hljs-built_in">empty</span>())&#123;<br>        <span class="hljs-type">int</span> u = q.<span class="hljs-built_in">front</span>();<br>        q.<span class="hljs-built_in">pop</span>();<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> idx : id[u])&#123;<br>            <span class="hljs-type">int</span> v = e[idx].v;<br>            <span class="hljs-keyword">if</span>(e[idx].c &lt;= <span class="hljs-number">0</span> || pre[v] != <span class="hljs-number">-1</span>) <span class="hljs-keyword">continue</span>;<br>            pre[v] = idx;<br>            flow[v] = <span class="hljs-built_in">min</span>(flow[u], e[idx].c);<br>            <span class="hljs-keyword">if</span>(v == t) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>            q.<span class="hljs-built_in">push</span>(v);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>&#125;<br><br><span class="hljs-function">ll <span class="hljs-title">edmonds_karp</span><span class="hljs-params">()</span></span>&#123;<br>    ll ans = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">while</span>(<span class="hljs-built_in">bfs</span>())&#123;<br>        ll pushed = flow[t];<br>        ans += pushed;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v = t; v != s; v = e[pre[v] ^ <span class="hljs-number">1</span>].v)&#123;<br>            <span class="hljs-type">int</span> idx = pre[v];<br>            e[idx].c -= pushed;<br>            e[idx ^ <span class="hljs-number">1</span>].c += pushed;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> ans;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-literal">false</span>);<br>    cin.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br>    <span class="hljs-keyword">if</span>(!(cin &gt;&gt; n &gt;&gt; m &gt;&gt; s &gt;&gt; t)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    id.<span class="hljs-built_in">assign</span>(n + <span class="hljs-number">1</span>, &#123;&#125;);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; m; ++i)&#123;<br>        <span class="hljs-type">int</span> u, v;<br>        ll c;<br>        cin &gt;&gt; u &gt;&gt; v &gt;&gt; c;<br>        <span class="hljs-built_in">add</span>(u, v, c);<br>    &#125;<br>    cout &lt;&lt; <span class="hljs-built_in">edmonds_karp</span>() &lt;&lt; <span class="hljs-string">&#x27;\n&#x27;</span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>If the original graph contains both
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mo>→</mo><mi>v</mi></mrow><annotation encoding="application/x-tex">u\to v</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi><mo>→</mo><mi>u</mi></mrow><annotation encoding="application/x-tex">v\to u</annotation></semantics></math>,
+call <code>add()</code> separately for each one. This stores four edges
+in total. Each original edge has its own residual reverse edge; the two
+original edges must not be treated as one pair.</p>
+<p>EK takes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><msup><mi>E</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(VE^2)</annotation></semantics></math>
+time and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo>+</mo><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V+E)</annotation></semantics></math>
+space. Roughly speaking, the shortest BFS distance to each vertex never
+decreases as we augment. Before the same directed residual edge can
+become full again, the layer of its starting vertex must increase. An
+edge can therefore be a bottleneck at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(V)</annotation></semantics></math>
+times, giving
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>V</mi><mi>E</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(VE)</annotation></semantics></math>
+augmentations in total. Multiplying by the cost of each BFS gives this
+bound, usually ignoring the cost of initialising isolated vertices.</p>
+<h2 id="why-is-the-flow-maximum-when-no-augmenting-path-remains">Why is
+the flow maximum when no augmenting path remains?</h2>
+<p>Split all vertices into two sets
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mo>,</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">S,T</annotation></semantics></math>,
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mo>∈</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">s\in S</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>∈</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">t\in T</annotation></semantics></math>.
+This is an
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+cut. Its capacity only counts original edges directed from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munder><mo>∑</mo><mrow><mi>u</mi><mo>∈</mo><mi>S</mi><mo>,</mo><mspace width="0.167em"></mspace><mi>v</mi><mo>∈</mo><mi>T</mi></mrow></munder><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>u</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+c(S,T)=\sum_{u\in S,\,v\in T}c(u,v).
+</annotation></semantics></math></p>
+<p>Adding up the flow-balance equations over the vertices in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>,
+the internal edges cancel, leaving only the net flow across the
+boundary:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">|</mo><mo>=</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mi>f</mi><mo stretchy="false" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>S</mi><mo stretchy="false" form="postfix">)</mo><mo>≤</mo><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|f|=f(S,T)-f(T,S)\le c(S,T).
+</annotation></semantics></math></p>
+<p>So any flow is bounded by the capacity of any cut. We must subtract
+the flow crossing back from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>,
+rather than just counting what leaves
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>.</p>
+<p>When no augmenting path remains, let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+be the vertices still reachable from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+in the residual network, and put all other vertices in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.
+The sink is unreachable, so it belongs to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.</p>
+<p>Every original edge from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+is full; otherwise, we could reach further along its forward residual
+edge. Every original edge from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+carries zero flow; otherwise, its reverse residual edge would let us
+move from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>.
+Therefore,</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">|</mo><mi>f</mi><mo stretchy="false" form="prefix">|</mo><mo>=</mo><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mn>0</mn><mo>=</mo><mi>c</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo>,</mo><mi>T</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+|f|=c(S,T)-0=c(S,T).
+</annotation></semantics></math></p>
+<p>We already showed that every flow is bounded by every cut. Now their
+values are equal, so the current flow is a maximum flow and this cut is
+a minimum cut. The max-flow min-cut theorem turns “we cannot find
+another path” into a proof of optimality that we can actually check.</p>
+<p>EK augments along just one path per BFS. Could we reuse the layers
+found by the same BFS a few more times? We will pick this up in <a
+href="/dinic-bipartite-matching-en/">Dinic &amp; Maximum Bipartite
+Matching</a>.</p>
+<p>Further reading: <a
+target="_blank" rel="noopener" href="https://ocw.mit.edu/courses/6-046j-design-and-analysis-of-algorithms-spring-2012/7c2927794e61bd70c14c07728fa54375_MIT6_046JS12_lec13.pdf">MIT
+6.046J Network Flow</a>.</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Competitive-Coding/" class="category-chain-item">Competitive Coding</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Graph-Theory/" class="print-no-link">#Graph Theory</a>
+      
+        <a href="/tags/Network-Flow/" class="print-no-link">#Network Flow</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Network Flow Basics &amp; Maximum Flow</div>
+      <div>https://m1ku319.github.io/network-flow-basics-max-flow-en/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>M1KU</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>June 10, 2026</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/network-flow-basics-max-flow/" title="网络流初步 &amp; 最大流">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">网络流初步 &amp; 最大流</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/02/03/math%20and%20Fermat&#39;s%20little%20theorem/" title="费马小定理">
+                        <span class="hidden-mobile">费马小定理</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#gitalk-container', function() {
+      Fluid.utils.createCssLink('/css/gitalk.css')
+      Fluid.utils.createScript('https://lib.baomitu.com/gitalk/1.8.0/gitalk.min.js', function() {
+        var options = Object.assign(
+          {"clientID":"Ov23liQ7e35dsru6W7gx","clientSecret":"580874ca2a35fa61bd6f1a399c8b476b9c7e5e18","repo":"blog-comment","owner":"M1KU319","admin":["M1KU319"],"language":"zh-CN","labels":["Gitalk"],"perPage":10,"pagerDirection":"last","distractionFreeMode":false,"createIssueManually":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token"},
+          {
+            id: '3efd47171fd8390e02f98de21fe9f818'
+          }
+        )
+        var gitalk = new Gitalk(options);
+        gitalk.render('gitalk-container');
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  
+      <script>
+        if (!window.MathJax) {
+          window.MathJax = {
+            tex    : {
+              inlineMath: { '[+]': [['$', '$']] }
+            },
+            loader : {
+              load: ['ui/lazy']
+            },
+            options: {
+              renderActions: {
+                insertedScript: [200, () => {
+                  document.querySelectorAll('mjx-container').forEach(node => {
+                    let target = node.parentNode;
+                    if (target.nodeName.toLowerCase() === 'li') {
+                      target.parentNode.classList.add('has-jax');
+                    }
+                  });
+                }, '', false]
+              }
+            }
+          };
+        } else {
+          MathJax.startup.document.state(0);
+          MathJax.texReset();
+          MathJax.typeset();
+          MathJax.typesetPromise();
+        }
+
+        Fluid.events.registerRefreshCallback(function() {
+          if ('MathJax' in window && MathJax.startup.document && typeof MathJax.startup.document.state === 'function') {
+            MathJax.startup.document.state(0);
+            MathJax.texReset();
+            MathJax.typeset();
+            MathJax.typesetPromise();
+          }
+        });
+      </script>
+    
+
+  <script  src="https://lib.baomitu.com/mathjax/3.2.2/es5/tex-mml-chtml.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>

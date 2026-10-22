@@ -1,0 +1,4 @@
+/* Keep homepage post cards focused on titles and metadata. */
+.index-excerpt {
+  display: none;
+}
